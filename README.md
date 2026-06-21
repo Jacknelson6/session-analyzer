@@ -62,12 +62,12 @@ plausible-but-wrong answer — fewer back-and-forths, more autonomy.
 
 On a suite of edge-case tasks where the obvious implementation is wrong (a
 discount that forgets to clamp, an average that divides by zero on empty), the
-same A/B (Sonnet 4.6):
+same A/B — and the gate brings both models to 100% first-pass correct:
 
-| | first-pass correct |
-| --- | --- |
-| no verify gate | 50% |
-| verify gate encoded | 100% |
+| model | no verify gate | verify gate encoded |
+| --- | --- | --- |
+| Sonnet 4.6 | 50% | 100% |
+| Opus 4.8 | 67% | 100% |
 
 It costs a few more turns — the agent runs the check and fixes — and that is the
 point: right the first time. See [`bench/tasks-loop.jsonl`](bench/tasks-loop.jsonl).
