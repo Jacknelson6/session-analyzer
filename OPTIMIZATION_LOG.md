@@ -129,3 +129,11 @@ wrong on a real run.
     rate; on a complete spec that is ~0, and output quality is already at the
     ceiling. Cycle 2 under-specifies (goal only, edges hidden in the grader) to
     find the cap inside the loop's actual operating band.
+40. Loop-cap cycle 2 (under-specified ladder: goal only, edges hidden in grader).
+    T1-T3: both models still 100% first-pass (they infer the implicit edges). T4
+    (symptom far from cause): Opus still 100%; Sonnet's first-pass finally breaks
+    (A=83%) and the gate makes it WORSE (C=67%, lift -17%, damage c->i=2 > rescues
+    i->c=1) on the billing-proration task -- the predicted localization collapse
+    (RefineBench/SCoRe): a blind self-test loop cannot tell the model WHERE the
+    bug is, so its revisions damage correct work. Cap located at T4 for Sonnet
+    (small n: one failing task), beyond this ladder for Opus. Firming T4 next.
