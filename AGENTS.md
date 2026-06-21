@@ -1,6 +1,8 @@
 # AGENTS.md
 
-How to drive session-analyzer from an agent. Humans: see [README.md](README.md).
+How to drive session-analyzer from an agent. Read by Claude Code, Codex,
+OpenCode, Cursor, and other agents — this is how any of them run the tool.
+Humans: see [README.md](README.md).
 
 ## What it does
 
