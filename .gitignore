@@ -1,0 +1,8 @@
+# scratch space for analyzer runs
+.sa/
+# python
+__pycache__/
+*.pyc
+.venv/
+# test scratch
+tests/fixtures/projects/
