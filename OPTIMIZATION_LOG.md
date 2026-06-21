@@ -119,3 +119,13 @@ wrong on a real run.
     fan-out only pays at much larger scale; the verify gate (not decomposition)
     drives first-pass correctness. Adopted looper as the loop-architecture
     baseline (docs/loop-architecture.md).
+39. RSI loop toward the loop/output-quality cap. Built a 4-tier difficulty ladder
+    (11 workflow-authored, self-validated fixtures) and ran Arm A (no gate) vs Arm
+    C (blind verify gate) on Sonnet 4.6 and Opus 4.8. Cycle 1 result: BOTH models
+    hit 100% first-pass on EVERY tier, so gate lift was 0 everywhere (the gate
+    only added 15-45% tokens). Cause: the fixtures over-specified the edge cases in
+    the README definition-of-done, so the model implemented them first-pass.
+    Finding: the verify-loop's value is bounded by the model's first-pass FAILURE
+    rate; on a complete spec that is ~0, and output quality is already at the
+    ceiling. Cycle 2 under-specifies (goal only, edges hidden in the grader) to
+    find the cap inside the loop's actual operating band.
