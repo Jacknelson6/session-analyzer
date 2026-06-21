@@ -1,0 +1,1 @@
+{"task": "loop-discount", "config": "baseline", "rep": 0, "input_tokens": 5, "output_tokens": 428, "cache_read": 72791, "cache_creation": 18337, "total_tokens": 91561, "cost_usd": 0.1382943, "num_turns": 3, "success": false, "answer": "Added `apply_discount` to `ledger/report.py:22`. It multiplies `amount` by `(1 - pct / 100)`, so `apply_discount(100, 10)` returns `90.0`."}

@@ -1,0 +1,3 @@
+{"id": "loop-discount", "prompt": "Add a function apply_discount(amount, pct) to ledger/report.py that returns amount reduced by pct percent. For example, apply_discount(100, 10) returns 90.", "check": "python3 .verify/check.py"}
+{"id": "loop-average", "prompt": "Add a function average_amount(store) to ledger/report.py that returns the mean of all transaction amounts.", "check": "python3 .verify/check.py"}
+{"id": "loop-format", "prompt": "Add a function format_total(amount) to ledger/report.py that returns a price string. For example, format_total(12.5) returns the string $12.50.", "check": "python3 .verify/check.py"}
