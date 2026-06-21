@@ -137,3 +137,12 @@ wrong on a real run.
     (RefineBench/SCoRe): a blind self-test loop cannot tell the model WHERE the
     bug is, so its revisions damage correct work. Cap located at T4 for Sonnet
     (small n: one failing task), beyond this ladder for Opus. Firming T4 next.
+41. Loop-cap firming (T4 expanded to 8 localization tasks, n=3, both models).
+    CORRECTS round 40's small-n "net-negative": with 8 tasks, Sonnet one-shots 7
+    of 8 (Arm A 92%), the gate nets +1 (Arm C 96%) with churn (rescued 2, broke 1)
+    and lifts the one hard task only 1/3 -> 2/3, not 3/3; Opus 100% on all 8.
+    THE LOOP/OUTPUT-QUALITY CAP: first-pass is already 92-100% for frontier models
+    even at T4, so the verify-loop's ceiling on well-formed tasks is single-digit
+    %, costs ~15% tokens, churns at the hardest, and cannot reliably localize. Its
+    value is confined to the narrow band of genuinely-missable implicit
+    requirements. Loop is surgical, not blanket. Written up in docs/loop-cap.md.

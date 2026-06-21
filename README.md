@@ -7,8 +7,8 @@
 It reads your Claude Code history and tells you how to fix your sessions so they
 cost less and your loops run better.
 
-**~41-47% fewer tokens, no quality loss, plus encoded verification that takes
-first-pass correctness to 100%.** Measured on Sonnet 4.6 and Opus 4.8.
+**~41-47% fewer tokens with no quality loss, plus an encoded verify-loop that
+catches the mistakes Claude would otherwise hand back.** Measured on Sonnet 4.6 and Opus 4.8.
 
 Works with Claude Code, Codex, OpenCode, and any agent that reads [`AGENTS.md`](AGENTS.md).
 
@@ -50,7 +50,9 @@ Measured A/B (the same tasks with vs without the tool's recommendations) on
 
 - **Tokens:** ~41% (Sonnet) to ~47% (Opus) fewer.
 - **Loops:** an encoded verify gate takes first-pass correctness from 50-67% to
-  **100%** on edge-case tasks.
+  **100%** on genuinely-missable edge cases. The lift is bounded though: on
+  well-formed tasks frontier models already pass 92-100% first-pass, so the gate
+  is surgical, not a blanket win (see [the loop cap](docs/loop-cap.md)).
 
 The loops it builds follow the [looper](https://github.com/ksimback/looper)
 architecture (plan and delivery gates, a different-model judge, stop guards):
