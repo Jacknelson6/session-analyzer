@@ -9,8 +9,8 @@ description: >-
   "what am I doing wrong in my sessions", "make my repo cheaper for agents", or
   wants a recurring efficiency review. The crunching is deterministic Python
   (zero model tokens); the agent reads a small digest and writes the advice.
-  Hard token budget: 200K single, 400K both (real runs use far less). Benchmarked: ~41% fewer tokens with no
-  loss in output quality.
+  Hard token budget: 200K single, 400K both (real runs use far less). Benchmarked:
+  ~41-47% fewer tokens with no loss in output quality (Sonnet 4.6 and Opus 4.8).
 ---
 
 # session-analyzer

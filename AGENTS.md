@@ -6,8 +6,8 @@ How to drive session-analyzer from an agent. Humans: see [README.md](README.md).
 
 Reads the user's Claude Code transcripts (and optionally a project), crunches
 them with plain Python (~0 model tokens) into a small digest, which you turn into
-concrete advice for working better with Claude Code. Benchmarked at ~41% fewer
-tokens with task success unchanged (see `bench/`).
+concrete advice for working better with Claude Code. Benchmarked at ~41-47% fewer
+tokens with task success unchanged, across Sonnet 4.6 and Opus 4.8 (see `bench/`).
 
 ## Voice
 

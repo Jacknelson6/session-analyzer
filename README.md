@@ -6,7 +6,7 @@
 
 It reads your Claude Code history and tells you how to fix your sessions so they cost less.
 
-**~41% fewer tokens, with no loss in output quality** — measured, not estimated ([proven below](#proven-savings)).
+**~41–47% fewer tokens, with no loss in output quality** — measured across Sonnet 4.6 and Opus 4.8 ([proven below](#proven-savings)).
 
 Zero dependencies · deterministic · hard token budget
 
@@ -35,17 +35,18 @@ under `claude -p` — once with no orientation file, once with the kind of
 `CLAUDE.md` this tool recommends generating — recording real token usage and a
 deterministic success check (tests pass, or the answer names the right file).
 
-Two suites on the fixture (Sonnet 4.6, ≥2 repeats each, 8 tasks total):
+8 tasks (navigation, multi-file edits, comprehension), ≥2 repeats each, run on
+two models — and the savings hold on both, with task success unchanged at 100%
+in every arm:
 
-| suite | baseline tok | optimized tok | savings | task success |
-| --- | --- | --- | --- | --- |
-| simple (navigation + small edits) | 913,221 | 448,705 | 50.9% | 100% → 100% |
-| harder (multi-file edits, comprehension) | 645,532 | 472,737 | 26.8% | 100% → 100% |
-| **combined** | **1,558,753** | **921,442** | **40.9%** | **100% → 100%** |
+| model | simple suite | harder suite | combined |
+| --- | --- | --- | --- |
+| Sonnet 4.6 | 50.9% | 26.8% | **40.9%** |
+| Opus 4.8 | 41.7% | 53.1% | **47.2%** |
 
-**~41% fewer tokens with task success unchanged.** The win is largest when a tight
-map replaces exploration (70–78% on navigation) and smaller on tasks with
-irreducible edit/test work (10–40%). Reproduce:
+**~41–47% fewer tokens with task success unchanged.** The win is largest where a
+tight map replaces exploration and smaller on tasks with irreducible edit/test
+work. Reproduce:
 
 ```bash
 python3 bench/run.py && python3 bench/report.py
