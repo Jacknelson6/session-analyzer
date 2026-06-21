@@ -53,6 +53,24 @@ python3 bench/run.py && python3 bench/report.py
 
 Full method and limits: [`bench/README.md`](bench/README.md).
 
+## Better loops
+
+Token savings is half the story. The other half: encoding the verification step
+Claude *can't infer* makes it catch its own mistakes instead of handing back a
+plausible-but-wrong answer — fewer back-and-forths, more autonomy.
+
+On a suite of edge-case tasks where the obvious implementation is wrong (a
+discount that forgets to clamp, an average that divides by zero on empty), the
+same A/B (Sonnet 4.6):
+
+| | first-pass correct |
+| --- | --- |
+| no verify gate | 50% |
+| verify gate encoded | 100% |
+
+It costs a few more turns — the agent runs the check and fixes — and that is the
+point: right the first time. See [`bench/tasks-loop.jsonl`](bench/tasks-loop.jsonl).
+
 ## How it works
 
 ![How Session Analyzer works](assets/how-it-works.png)
@@ -194,7 +212,8 @@ docs/                  transcript + finding schemas
 - Token counts are exact (from `usage`). Reclaimable-cost figures are estimates
   that depend on your prices and on caching being achievable.
 - Orphan detection is a heuristic, not a full bundler graph. It is tuned to
-  avoid false positives, so it misses some real dead code. Confirm with
+  avoid false positives, so it misses some real dead code. It traces JS/TS-style
+  imports, so it over-flags files in Python and other languages. Confirm with
   `knip`/`ts-prune`.
 - It reads transcripts and source read-only. It never changes your repo or its
   history.

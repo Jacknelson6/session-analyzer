@@ -42,7 +42,10 @@ Do not read raw transcripts; the scripts digest them.
 2. Read `"$OUT"/digest.md`, then the worst-session shards under `"$OUT"/shards/`
    while budget allows.
 3. Turn the strongest patterns into specific advice: workflow habits, the exact
-   `CLAUDE.md` lines to add or cut, a settings allowlist where it applies.
+   `CLAUDE.md` lines to add or cut, a settings allowlist where it applies, and
+   loop/self-verification gaps — encode the manual check Claude cannot infer (a
+   verify script + a CLAUDE.md rule), with a falsifiable success criterion and a
+   different-model judge for review.
 4. Deliver. Lead with the 2-3 highest-leverage changes, each with a real example
    from their sessions and the fix. Offer to apply them behind the user's verify
    gate. If clean, say so.
