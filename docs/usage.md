@@ -58,14 +58,14 @@ Flags: `--top N`, `--max-sessions N`, `--since DAYS`, `--projects-root PATH`,
 
 Where your sessions waste tokens, and where loops break down:
 
-- Cache misses — a low cache-hit ratio means paying full input rate for context
+- Cache misses: a low cache-hit ratio means paying full input rate for context
   that could be cached. Usually the biggest lever.
 - The same file read 3+ times in one session.
 - Oversized tool outputs flooding the context window.
-- Retry loops — identical commands re-run, usually a missing encoded check.
-- Loop / self-verification gaps — changes that shipped without running
+- Retry loops: identical commands re-run, usually a missing encoded check.
+- Loop / self-verification gaps: changes that shipped without running
   tests/build, and stretches where you had to step in turn after turn.
-- Context thrash — frequent compaction from a bloated standing prompt.
+- Context thrash: frequent compaction from a bloated standing prompt.
 
 The fixes: `CLAUDE.md` rules, an encoded verify gate (the check Claude can't
 infer), falsifiable success criteria, a settings allowlist.
@@ -90,7 +90,7 @@ refactor findings, so it does not flag what is not yours to change. See
 ## Works with other agents
 
 The tool is driven by [AGENTS.md](../AGENTS.md), which Claude Code, Codex,
-OpenCode, Cursor, and other agents read — so any of them can run it. `bin/analyze`
+OpenCode, Cursor, and other agents read, so any of them can run it. `bin/analyze`
 is plain stdlib Python and runs anywhere. The repo scan and the recommendations
 (orientation map, verify gate) are tool-agnostic. Session-token analysis currently
 parses Claude Code transcripts (`~/.claude/projects`); point `--projects-root`

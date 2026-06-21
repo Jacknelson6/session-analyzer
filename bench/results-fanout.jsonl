@@ -1,0 +1,4 @@
+{"arm": "monolithic", "rep": 0, "tokens": 283499, "turns": 9, "ok": true}
+{"arm": "fanout", "rep": 0, "tokens": 719060, "turns": 23, "ok": true}
+{"arm": "monolithic", "rep": 1, "tokens": 209604, "turns": 8, "ok": true}
+{"arm": "fanout", "rep": 1, "tokens": 719593, "turns": 22, "ok": true}

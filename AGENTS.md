@@ -1,7 +1,7 @@
 # AGENTS.md
 
 How to drive session-analyzer from an agent. Read by Claude Code, Codex,
-OpenCode, Cursor, and other agents — this is how any of them run the tool.
+OpenCode, Cursor, and other agents. This is how any of them run the tool.
 Humans: see [README.md](README.md).
 
 ## What it does
@@ -45,9 +45,10 @@ Do not read raw transcripts; the scripts digest them.
    while budget allows.
 3. Turn the strongest patterns into specific advice: workflow habits, the exact
    `CLAUDE.md` lines to add or cut, a settings allowlist where it applies, and
-   loop/self-verification gaps — encode the manual check Claude cannot infer (a
-   verify script + a CLAUDE.md rule), with a falsifiable success criterion and a
-   different-model judge for review.
+   loop/self-verification gaps. For loops, follow the looper architecture
+   (`docs/loop-architecture.md`): a falsifiable definition of done, an encoded
+   programmatic gate, plan and delivery gates with a different-model judge, and
+   stop guards (max iterations, revise cap, no-progress, budget).
 4. Deliver. Lead with the 2-3 highest-leverage changes, each with a real example
    from their sessions and the fix. Offer to apply them behind the user's verify
    gate. If clean, say so.

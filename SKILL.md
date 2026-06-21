@@ -81,20 +81,21 @@ For each strong pattern, write the user a specific improvement. Good targets:
 - Settings: a permission allowlist for safe commands the user keeps getting
   prompted on, but only where it actually applies (check the project's settings
   first).
-- Loop & self-verification (often the highest-leverage area): the signs that
-  Claude could not verify its own work and had to hand back to the user — retry
-  loops (the same command re-run by trial and error), changes that shipped
-  without running tests/build/typecheck, and stretches where the user stepped in
-  turn after turn. For each, recommend *encoding the missing check* so the loop
-  closes itself:
-  - Write the manual check Claude cannot infer into a verify step (a script, a
-    test, a checklist) plus a CLAUDE.md rule to run it before finishing.
-  - Give ambitious tasks an explicit, falsifiable success criterion up front and
-    a termination guard (iteration cap / no-progress stop).
-  - For review, prefer a second agent or a different model as judge, so the model
-    that wrote the code is not the one grading it.
-  - For multi-step work, point the user at the `looper` skill to design the loop
-    (Goal -> Plan -> Review -> Deliver -> Judge -> Stop) before running it.
+- Loop & self-verification (often the highest-leverage area). Look for signs that
+  Claude could not verify its own work and had to hand back to the user: retry
+  loops (the same command re-run by trial and error), changes that shipped without
+  running tests/build/typecheck, and stretches where the user stepped in turn
+  after turn. Recommend the looper loop architecture (see
+  `docs/loop-architecture.md`) so the loop closes itself:
+  - Define the goal and a falsifiable definition of done up front.
+  - Encode the manual check Claude cannot infer as a programmatic gate (a script
+    or test), classified programmatic / judge / human, plus a CLAUDE.md rule to
+    run it before finishing.
+  - Put multi-step work behind a plan gate and a delivery gate; the judge should
+    be a different model than the one doing the work (no self-grading).
+  - Always include stop guards: max iterations (default 12), a revise cap per
+    gate (default 3), a no-progress stop (x2), and a budget cap.
+  - For a full, runnable loop spec, point the user at the `looper` skill (`/looper`).
 
 Then deliver:
 

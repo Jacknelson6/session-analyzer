@@ -110,3 +110,12 @@ wrong on a real run.
     work, not cheap navigation. Runner now stores the agent's answer text so a
     failed check is debuggable (one real-repo nav task failed both arms on a bad
     check assumption, invisible until now).
+38. RSI loop cycle 1 (target >=70% tokens + >=90% first-pass): tested context
+    isolation / fan-out (one fresh sub-session per feature) vs a monolithic
+    session on a 5-feature task. Fan-out used +192% MORE tokens: per-session base
+    overhead dominates on small tasks. Both arms hit 100% correctness behind the
+    verify gate. REJECTED as a token lever at this scale. Takeaways: the
+    orientation map (~47%) is the realistic token ceiling on benchmarkable tasks;
+    fan-out only pays at much larger scale; the verify gate (not decomposition)
+    drives first-pass correctness. Adopted looper as the loop-architecture
+    baseline (docs/loop-architecture.md).
