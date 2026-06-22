@@ -146,3 +146,10 @@ wrong on a real run.
     %, costs ~15% tokens, churns at the hardest, and cannot reliably localize. Its
     value is confined to the narrow band of genuinely-missable implicit
     requirements. Loop is surgical, not blanket. Written up in docs/loop-cap.md.
+42. Pareto demo (3 arms on a 23-file repo, 3 multi-step feature tasks, n=3, both
+    models): baseline vs orientation-map vs verify-gate, hidden-test graded.
+    Orientation is Pareto-dominant: Opus -17% tokens AND 89->100% accuracy; Sonnet
+    flat tokens (+2%), 67->78% accuracy. The gate matches orientation's accuracy
+    but costs +18-26% more tokens for no gain -- dominated. Answer to "reduce
+    tokens, keep output for loops": the orientation map; the gate is surgical, not
+    a default.

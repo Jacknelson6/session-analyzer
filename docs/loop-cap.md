@@ -73,3 +73,24 @@ Small n (n=3 across 8 hard tasks); correctness graded by hidden tests only (no
 judge-rubric quality score in this run); tasks are puzzle-to-module scale, not
 full-repo; the SWE-bench Verified external-validity anchor was specified but not
 run. The cap is located to a tier and a regime, not estimated to the point.
+
+## Pareto check: orientation dominates the gate (3 arms, 23-file repo)
+
+To answer "can we cut tokens AND keep output for loops," a 3-arm run on a 23-file
+warehouse repo, 3 multi-step feature tasks, hidden-test graded, n=3:
+
+| arm | Sonnet (acc / tokens) | Opus (acc / tokens) |
+| --- | --- | --- |
+| baseline (no map) | 67% / 515k | 89% / 1,075k |
+| orientation map | 78% / 524k | 100% / 889k |
+| verify gate | 78% / 649k | 100% / 1,268k |
+
+- **Orientation is the Pareto move.** Opus: -17% tokens AND 89->100% accuracy.
+  Sonnet: flat tokens (+2%), 67->78% accuracy. Better-or-equal output for
+  fewer-or-equal tokens.
+- **The gate is dominated.** It matches orientation's accuracy but costs +18-26%
+  more tokens for no quality gain. As a blanket step it is pure overhead.
+
+So "reduce tokens and keep output for loops" = the orientation map. The verify
+gate is not a default; it is surgical, for the narrow band where the model
+actually fails first-pass and has a real check to run.

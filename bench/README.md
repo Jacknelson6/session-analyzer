@@ -1,13 +1,29 @@
-# bench — proving the savings
+# SA-Bench
 
-The repo claims session-analyzer cuts token waste. This is where that claim is
-measured, not estimated.
+The **Session Analyzer Benchmark**: a from-scratch A/B harness that measures
+whether a Claude Code workflow change actually pays. The same tasks run with vs
+without the change under `claude -p`, with real token usage and blind hidden-test
+grading (the grader is added only after the agent exits). This is where the repo's
+claims are measured, not estimated.
 
-**Result: ~41% (Sonnet 4.6) to ~47% (Opus 4.8) fewer tokens across 8 fixture
-tasks, task success unchanged at 100%.** A separate loop suite shows an encoded
-verify gate taking first-pass correctness from 50% to 100%. On a large,
-grep-friendly real repo a *generic* CLAUDE.md did not help navigation — the
-savings live in exploration- and re-read-heavy work, not cheap nav.
+## Headline results
+
+Orientation map, 3-arm run on a 23-file repo with multi-step feature tasks
+(pass rate / mean tokens):
+
+| config | Sonnet 4.6 | Opus 4.8 |
+| --- | --- | --- |
+| no map | 67% / 515K | 89% / 1.08M |
+| **+ orientation map** | **78% / 524K** | **100% / 889K** |
+| + verify gate | 78% / 649K | 100% / 1.27M |
+
+- **Orientation map = Pareto win:** Opus -17% tokens and 89 -> 100% pass; Sonnet
+  better output at flat cost. Across a separate 8-task suite it saves ~41%
+  (Sonnet) to ~47% (Opus) tokens with output held at 100%.
+- **Verify gate = dominated:** matches the map's accuracy for +18-26% tokens, no
+  gain. Surgical, not a default.
+- **Loop cap** (difficulty ladder): the gate only helps in the narrow band where
+  the model fails first-pass and has a real check. See `../docs/loop-cap.md`.
 
 ## Method (A/B, same task, two configs)
 

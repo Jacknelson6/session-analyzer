@@ -43,21 +43,39 @@ judgment calls.
 
 `--mode both` runs them together. Details in [docs/usage.md](docs/usage.md).
 
-## Proven
+## Proven on SA-Bench
 
-Measured A/B (the same tasks with vs without the tool's recommendations) on
-**Sonnet 4.6 and Opus 4.8**, with task success held at **100% in every arm**:
+**SA-Bench** is the from-scratch A/B benchmark we built to measure whether a
+Claude Code workflow change actually pays: the same tasks run with vs without the
+change, real token usage, blind hidden-test grading, on both Sonnet 4.6 and Opus
+4.8.
 
-- **Tokens:** ~41% (Sonnet) to ~47% (Opus) fewer.
-- **Loops:** an encoded verify gate takes first-pass correctness from 50-67% to
-  **100%** on genuinely-missable edge cases. The lift is bounded though: on
-  well-formed tasks frontier models already pass 92-100% first-pass, so the gate
-  is surgical, not a blanket win (see [the loop cap](docs/loop-cap.md)).
+### The orientation map: fewer tokens *and* better output
 
-The loops it builds follow the [looper](https://github.com/ksimback/looper)
-architecture (plan and delivery gates, a different-model judge, stop guards):
-see [docs/loop-architecture.md](docs/loop-architecture.md). Full benchmark tables
-and method: [bench/README.md](bench/README.md).
+3-arm run on a 23-file repo with multi-step feature tasks (pass rate / mean tokens):
+
+| config | Sonnet 4.6 | Opus 4.8 |
+| --- | --- | --- |
+| no map | 67% / 515K | 89% / 1.08M |
+| **+ orientation map** | **78% / 524K** | **100% / 889K** |
+| + verify gate | 78% / 649K | 100% / 1.27M |
+
+The map is a clean Pareto win: **Opus −17% tokens and 89 → 100% pass; Sonnet
+better output at flat cost.** The verify gate matches the map's accuracy but costs
+**18-26% more tokens for no gain** — so it is surgical, not a default.
+
+### Token savings across a task suite
+
+Orientation vs none, 8 tasks, task success held at **100% in every arm**:
+
+| model | tokens saved |
+| --- | --- |
+| Sonnet 4.6 | **~41%** |
+| Opus 4.8 | **~47%** |
+
+Full method, the difficulty-ladder cap analysis, and the looper loop architecture:
+[bench/README.md](bench/README.md), [docs/loop-cap.md](docs/loop-cap.md),
+[docs/loop-architecture.md](docs/loop-architecture.md).
 
 ## Install
 
