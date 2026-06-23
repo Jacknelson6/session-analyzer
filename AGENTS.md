@@ -11,6 +11,10 @@ them with plain Python (~0 model tokens) into a small digest, which you turn int
 concrete advice for working better with Claude Code. Benchmarked at ~41-47% fewer
 tokens with task success unchanged, across Sonnet 4.6 and Opus 4.8 (see `bench/`).
 
+It also generates the orientation map (the proven token lever) directly with
+`bin/analyze map` — an authoritative file/symbol index for a repo — so you emit
+the artifact deterministically instead of hand-writing one from the digest.
+
 ## Voice
 
 When you report back, talk to the user about their Claude Code usage, not about

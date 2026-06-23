@@ -7,8 +7,10 @@
 It reads your Claude Code history and tells you how to fix your sessions so they
 cost less and your loops run better.
 
-**~41-47% fewer tokens with no quality loss, plus an encoded verify-loop that
-catches the mistakes Claude would otherwise hand back.** Measured on Sonnet 4.6 and Opus 4.8.
+**~41-47% fewer tokens with no quality loss.** It generates the proven token
+lever — an orientation map of your repo — on demand with `bin/analyze map`, and
+flags the loop gaps that make Claude hand work back to you. Measured on Sonnet
+4.6 and Opus 4.8.
 
 Works with Claude Code, Codex, OpenCode, and any agent that reads [`AGENTS.md`](AGENTS.md).
 
@@ -57,6 +59,18 @@ bin/analyze map --repo "$PWD" --out CLAUDE.md
 
 It emits an authoritative file/symbol index plus a read-once rule and the right
 verify command for your stack (Python/JS/TS/Go/Rust). Zero model tokens to build.
+
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `analyze --mode tokens\|repo\|both` | Find token waste, loop gaps, and repo structure problems |
+| `map --repo PATH --out CLAUDE.md` | Generate the orientation map (the proven token lever) |
+| `doctor` | Show which sessions and projects the tool can see |
+| `render BUNDLE.json` | Re-render a saved run (merges a sibling `synthesis.json`) |
+
+Every flag is in [docs/usage.md](docs/usage.md); `bin/analyze <command> --help`
+prints them too.
 
 ## Proven on SA-Bench
 
