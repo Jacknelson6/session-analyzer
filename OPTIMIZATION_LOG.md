@@ -146,6 +146,22 @@ wrong on a real run.
     %, costs ~15% tokens, churns at the hardest, and cannot reliably localize. Its
     value is confined to the narrow band of genuinely-missable implicit
     requirements. Loop is surgical, not blanket. Written up in docs/loop-cap.md.
+43. Operationalized the proven lever as a command (`map`). Rounds 36-42 proved the
+    orientation map is the #1 token win (Pareto: ~41-47% fewer tokens, quality
+    held), but the tool only *advised* writing one -- the agent hand-rolled it from
+    the digest every run, which itself costs tokens and varies in quality. Added
+    `src/orient.py` + `bin/analyze map`: a deterministic generator that emits the
+    map in the exact format the benchmark validated (authoritative file/symbol
+    index + read-once rule + a stack-detected verify command). Python surfaces via
+    stdlib `ast` (dataclass fields, class methods, function signatures); JS/TS/Go/
+    Rust via export scanning. Generated/vendored/minified/junk and dot-dir files
+    excluded (the latter prevents leaking a hidden grader dir into the map). Proof:
+    a deterministic test (`OrientationMap.test_matches_validated_winning_config`)
+    asserts the generated map carries the same module set, public surface, and
+    verify command as `bench/configs/optimized/CLAUDE.md`, so the measured savings
+    transfer; the bench runner accepts the generated file via `BENCH_OPT_CLAUDE`
+    for an end-to-end A/B. Suite 19 -> 26 tests, all green. SKILL.md/AGENTS.md now
+    direct the agent to generate the map rather than hand-write it.
 42. Pareto demo (3 arms on a 23-file repo, 3 multi-step feature tasks, n=3, both
     models): baseline vs orientation-map vs verify-gate, hidden-test graded.
     Orientation is Pareto-dominant: Opus -17% tokens AND 89->100% accuracy; Sonnet

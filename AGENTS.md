@@ -45,7 +45,12 @@ Do not read raw transcripts; the scripts digest them.
    while budget allows.
 3. Turn the strongest patterns into specific advice: workflow habits, the exact
    `CLAUDE.md` lines to add or cut, a settings allowlist where it applies, and
-   loop/self-verification gaps. For loops, follow the looper architecture
+   loop/self-verification gaps. When the sessions show repeated tree re-exploration
+   (re-reads, broad searches before editing), the highest-leverage fix is the
+   orientation map -- the benchmark-proven token lever (~41-47% fewer tokens,
+   quality held). Generate it instead of hand-writing it:
+   `"$SA" map --repo "/path/to/project" --out "/path/to/project/CLAUDE.md"`.
+   For loops, follow the looper architecture
    (`docs/loop-architecture.md`): a falsifiable definition of done, an encoded
    programmatic gate, plan and delivery gates with a different-model judge, and
    stop guards (max iterations, revise cap, no-progress, budget).
@@ -71,6 +76,7 @@ Do not read raw transcripts; the scripts digest them.
 | Scoped to one project | `"$SA" analyze --mode tokens --scope-repo --repo "/path" --out "$OUT"` |
 | Project structure too | `"$SA" analyze --mode both --repo "/path" --out "$OUT"` |
 | Last 7 days | append `--since 7` |
+| Generate the orientation map (proven token lever) | `"$SA" map --repo "/path" --out "/path/CLAUDE.md"` |
 | What can it see? | `"$SA" doctor` |
 
 Full flags: `"$SA" analyze --help`. Finding fields: [docs/finding-schema.md](docs/finding-schema.md).

@@ -49,6 +49,23 @@ BENCH_MODEL=claude-sonnet-4-6 BENCH_REPEATS=2 python3 bench/run.py
 python3 bench/report.py
 ```
 
+### Proving the *generated* map (the `map` command)
+
+The optimized arm above used a hand-written `configs/optimized/CLAUDE.md`. The
+`map` command now generates that artifact deterministically. To prove the
+generated map is a drop-in for the validated one, point the runner at it:
+
+```bash
+./bin/analyze map --repo bench/fixture --out /tmp/generated-map.md
+BENCH_OPT_CLAUDE=/tmp/generated-map.md python3 bench/run.py
+python3 bench/report.py
+```
+
+A zero-token structural proof runs in the test suite
+(`OrientationMap.test_matches_validated_winning_config`): it asserts the
+generated map carries the same module index, public surface, and verify command
+as the benchmark-validated config, so the measured savings transfer.
+
 Each task runs `REPEATS` times per arm to average out run-to-run nondeterminism;
 the report shows per-task and overall savings with both success rates.
 

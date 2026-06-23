@@ -43,6 +43,21 @@ judgment calls.
 
 `--mode both` runs them together. Details in [docs/usage.md](docs/usage.md).
 
+## The orientation map, on demand
+
+The benchmark below proves the orientation map is the single highest-leverage
+token lever (a Pareto win: fewer tokens *and* better output). `bin/analyze map`
+generates one for any repo deterministically, in the exact format SA-Bench
+validated, so you stop paying the agent to re-derive your repo's layout every
+session:
+
+```bash
+bin/analyze map --repo "$PWD" --out CLAUDE.md
+```
+
+It emits an authoritative file/symbol index plus a read-once rule and the right
+verify command for your stack (Python/JS/TS/Go/Rust). Zero model tokens to build.
+
 ## Proven on SA-Bench
 
 **SA-Bench** is the from-scratch A/B benchmark we built to measure whether a

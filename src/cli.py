@@ -4,6 +4,7 @@ Subcommands:
   analyze   run a full pass (tokens | repo | both) and render a report
   extract   emit the deterministic metrics + a token-bounded agent digest only
   render    re-render a saved run bundle (terminal or markdown)
+  map       generate an orientation CLAUDE.md (the proven token lever)
 
 The deterministic pass needs no agent. The optional synthesis step is driven by
 the SKILL.md instructions, which read the small digest this CLI writes and append
@@ -180,6 +181,33 @@ def _merge_synthesis(bundle: dict, path: Path) -> int:
     return len(extra)
 
 
+def cmd_map(args) -> int:
+    """Generate an orientation CLAUDE.md for a repo (the proven token lever).
+
+    SA-Bench measures the orientation map as a Pareto win (~41-47% fewer tokens,
+    quality held). This emits one deterministically instead of having the agent
+    re-derive it from scratch each run.
+    """
+    from .orient import build_map, render_map
+
+    m = build_map(args.repo, max_modules=args.max_modules, verify_cmd=args.verify_cmd)
+    if args.format == "json":
+        print(json.dumps(m, indent=2))
+        return 0
+    text = render_map(m)
+    if args.out:
+        out_path = Path(args.out)
+        if out_path.is_dir():
+            out_path = out_path / "CLAUDE.md"
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(text)
+        print(f"[map] wrote orientation map ({len(m['modules'])} modules) to {out_path}",
+              file=sys.stderr)
+    else:
+        print(text)
+    return 0
+
+
 def cmd_render(args) -> int:
     bundle_path = Path(args.bundle)
     bundle = json.loads(bundle_path.read_text())
@@ -236,6 +264,17 @@ def build_parser() -> argparse.ArgumentParser:
     d = sub.add_parser("doctor", help="show discoverable sessions / projects")
     d.add_argument("--projects-root", default=None)
     d.set_defaults(func=cmd_doctor)
+
+    m = sub.add_parser("map", help="generate an orientation CLAUDE.md (the proven token lever)")
+    m.add_argument("--repo", default=".", help="repo to map (default: cwd)")
+    m.add_argument("--out", default=None,
+                   help="write the map here (a dir gets CLAUDE.md); default: stdout")
+    m.add_argument("--max-modules", type=int, default=40,
+                   help="cap the number of modules listed (default: 40)")
+    m.add_argument("--verify-cmd", default=None,
+                   help="override the auto-detected verify command")
+    m.add_argument("--format", choices=["markdown", "json"], default="markdown")
+    m.set_defaults(func=cmd_map)
     return p
 
 
