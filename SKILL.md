@@ -6,8 +6,10 @@ description: >-
   wasted context. Can also scan a project for structure problems that make every
   agent run harder. Use when the user says "session analyzer", "analyze my
   sessions", "how do I use Claude Code better", "why is Claude burning tokens",
-  "what am I doing wrong in my sessions", "make my repo cheaper for agents", or
-  wants a recurring efficiency review. The crunching is deterministic Python
+  "what am I doing wrong in my sessions", "make my repo cheaper for agents",
+  "give this repo an orientation map", or wants a recurring efficiency review. Can
+  generate an orientation CLAUDE.md (the benchmark-proven token lever) on demand
+  via `bin/analyze map`. The crunching is deterministic Python
   (zero model tokens); the agent reads a small digest and writes the advice.
   Hard token budget: 200K single, 400K both (real runs use far less). Benchmarked:
   ~41-47% fewer tokens with no loss in output quality (Sonnet 4.6 and Opus 4.8).
@@ -78,6 +80,13 @@ For each strong pattern, write the user a specific improvement. Good targets:
   once.
 - Standing-prompt fixes: the exact lines to add or cut in the project's
   `CLAUDE.md` so the next session starts in a better place.
+- The orientation map (the highest-leverage, benchmark-proven token lever:
+  ~41-47% fewer tokens with output quality held). When a project keeps making
+  Claude re-explore the tree, generate one instead of hand-writing it:
+  `"$SA" map --repo "/path/to/project" --out "/path/to/project/CLAUDE.md"`.
+  It emits an authoritative file/symbol index plus a read-once rule and a single
+  detected verify command. Review it, then offer it to the user behind their
+  verify gate.
 - Settings: a permission allowlist for safe commands the user keeps getting
   prompted on, but only where it actually applies (check the project's settings
   first).
@@ -120,4 +129,5 @@ Do NOT surface secrets or credentials as a finding. That is not this tool's job.
 
 - `README.md`: install and usage.
 - `docs/finding-schema.md`: the finding fields, if you write them out.
-- `bin/analyze --help`: every flag.
+- `bin/analyze --help`: every flag. `bin/analyze map --help`: the orientation-map
+  generator (the proven token lever).

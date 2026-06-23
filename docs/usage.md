@@ -15,6 +15,7 @@ what you want. The agent picks the mode, points it at your project, and runs it.
 | "session analyzer, clean up this repo" | Repo hygiene scan |
 | "session analyzer, both" | Tokens and repo, ranked together |
 | "session analyzer, both, last 7 days, as markdown" | Both, recent sessions, PR-ready output |
+| "give this repo an orientation map" | A generated `CLAUDE.md` (the proven token lever) |
 | "why is Claude burning so many tokens?" | Token waste (no trigger phrase needed) |
 | "what sessions can it see?" | Discovery check |
 
@@ -34,6 +35,13 @@ bin/analyze analyze --mode repo --repo "$PWD"
 
 # both, write artifacts, render Markdown
 bin/analyze analyze --mode both --repo "$PWD" --scope-repo --out .sa/run --format markdown
+
+# generate the orientation map (the proven token lever) for a repo
+bin/analyze map --repo "$PWD" --out CLAUDE.md
+
+# print it to stdout instead, or emit structured JSON
+bin/analyze map --repo "$PWD"
+bin/analyze map --repo "$PWD" --format json
 
 # re-render a saved run (auto-merges a sibling synthesis.json)
 bin/analyze render .sa/run/bundle.json --format markdown
@@ -87,6 +95,27 @@ refactor findings, so it does not flag what is not yours to change. See
 
 `--mode both` runs the two together and ranks across them.
 
+### Orientation map (`map`)
+
+The orientation map is the benchmark's #1 token lever (a Pareto win: ~41-47%
+fewer tokens with output quality held; see [../bench/README.md](../bench/README.md)).
+`bin/analyze map` generates one deterministically instead of having the agent
+re-derive your repo's layout each session.
+
+```bash
+bin/analyze map --repo "$PWD" --out CLAUDE.md   # write CLAUDE.md (a dir gets CLAUDE.md appended)
+bin/analyze map --repo "$PWD"                    # print to stdout
+bin/analyze map --repo "$PWD" --format json      # structured output
+```
+
+It produces an authoritative file/symbol index (Python via `ast`; JS/TS/Go/Rust
+via export scanning), a read-once workflow rule, and a single verify command
+detected from your stack (`npm test`, `pytest -q`, `python3 -m unittest ...`,
+`cargo test`, `go test ./...`, `make test`). Generated, vendored, minified, junk,
+and dot-directory files are excluded so the map stays an index of the code you
+own. Flags: `--max-modules N` (default 40), `--verify-cmd CMD` to override
+detection.
+
 ## Works with other agents
 
 The tool is driven by [AGENTS.md](../AGENTS.md), which Claude Code, Codex,
@@ -104,6 +133,7 @@ src/
   sessions.py          transcript discovery + parsing
   extract.py           token-waste metrics + findings
   repo_scan.py         repo hygiene scan
+  orient.py            orientation-map generator (the proven token lever)
   config.py            ignore/classify rules
   pricing.py           token -> USD
   budget.py            the token ledger

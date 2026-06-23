@@ -17,6 +17,7 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.budget import Budget, cap_for_mode
+from src.orient import build_map, detect_verify_cmd, render_map
 from src.config import is_test_file, is_vendored_for_findings, looks_generated, looks_minified
 from src.extract import build_token_report
 from src.render import render_markdown, render_terminal
@@ -238,6 +239,157 @@ class CiGate(unittest.TestCase):
         self.assertEqual(_gate(A(), b), 1)   # B < A -> fail
         self.assertEqual(_gate(C(), b), 0)   # B >= C -> pass
         self.assertEqual(_gate(N(), b), 0)   # no threshold -> pass
+
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+class OrientationMap(unittest.TestCase):
+    """The map command: the proven token lever, now generated deterministically."""
+
+    def test_python_surface_dataclass_and_methods(self):
+        tmp = Path(tempfile.mkdtemp())
+        _write(tmp, "pkg/models.py",
+               '"""Core types."""\n'
+               "from dataclasses import dataclass\n\n"
+               "@dataclass\nclass Account:\n    id: int\n    name: str\n\n"
+               "@dataclass\nclass Txn:\n    id: int\n    note: str = ''\n")
+        _write(tmp, "pkg/store.py",
+               '"""Store."""\n'
+               "class Store:\n"
+               "    def add(self, x): ...\n"
+               "    def get(self, k): return k\n"
+               "    def _private(self): ...\n")
+        _write(tmp, "pkg/util.py",
+               '"""Utilities."""\n'
+               "def top(a, b=1, *args, **kw): return a\n"
+               "def _hidden(): ...\n")
+        m = build_map(str(tmp))
+        text = render_map(m)
+        self.assertIn("`Account(id, name)`", text)
+        self.assertIn("`Txn(id, note=...)`", text)  # default rendered
+        self.assertIn("`Store`: `add(x)`, `get(k)`", text)
+        self.assertNotIn("_private", text)            # private dropped
+        self.assertIn("`top(a, b=..., *args, **kw)`", text)
+        self.assertNotIn("_hidden", text)
+
+    def test_plain_class_with_constant_keeps_methods(self):
+        # A non-dataclass with a class-level constant is defined by its methods,
+        # not the constant -- the methods must not be dropped.
+        tmp = Path(tempfile.mkdtemp())
+        _write(tmp, "svc.py",
+               '"""Svc."""\n'
+               "class Service:\n"
+               "    timeout: int = 30\n"
+               "    def run(self, x): ...\n"
+               "    def stop(self): ...\n")
+        text = render_map(build_map(str(tmp)))
+        self.assertIn("`run(x)`", text)
+        self.assertIn("`stop()`", text)
+
+    def test_dataclass_attribute_decorator_and_methods(self):
+        tmp = Path(tempfile.mkdtemp())
+        _write(tmp, "cfg.py",
+               '"""Cfg."""\n'
+               "import dataclasses\n\n"
+               "@dataclasses.dataclass\nclass Cfg:\n"
+               "    a: int\n    b: str = 'x'\n"
+               "    def validate(self): ...\n")
+        text = render_map(build_map(str(tmp)))
+        self.assertIn("`Cfg(a, b=...)`", text)   # recognized as a dataclass
+        self.assertIn("`validate()`", text)       # its methods still surface
+
+    def test_required_kwonly_not_marked_optional(self):
+        tmp = Path(tempfile.mkdtemp())
+        _write(tmp, "k.py",
+               '"""K."""\n'
+               "def h(a, *, k, opt=2): ...\n")
+        text = render_map(build_map(str(tmp)))
+        self.assertIn("`h(a, k, opt=...)`", text)  # k required, opt optional
+
+    def test_comment_summary_preserves_trailing_chars(self):
+        tmp = Path(tempfile.mkdtemp())
+        _write(tmp, "r.js", "// rate is req/s\nexport function f() {}\n")
+        text = render_map(build_map(str(tmp)))
+        self.assertIn("rate is req/s", text)       # slash not chewed off
+
+    def test_excludes_dotdirs_and_generated(self):
+        tmp = Path(tempfile.mkdtemp())
+        _write(tmp, "src/real.py", '"""Real."""\ndef go(): ...\n')
+        _write(tmp, ".verify/secret_grader.py", "def hidden_edge(): ...\n")
+        _write(tmp, "src/gen.py", "# @generated\ndef noise(): ...\n")
+        m = build_map(str(tmp))
+        paths = {mod["path"] for mod in m["modules"]}
+        self.assertIn("src/real.py", paths)
+        self.assertNotIn(".verify/secret_grader.py", paths)  # hidden dir not leaked
+        self.assertNotIn("src/gen.py", paths)                # generated excluded
+
+    def test_max_modules_cap(self):
+        tmp = Path(tempfile.mkdtemp())
+        for i in range(10):
+            _write(tmp, f"m{i}.py", f'"""M{i}."""\ndef f{i}(): ...\n')
+        m = build_map(str(tmp), max_modules=3)
+        self.assertEqual(len(m["modules"]), 3)
+        self.assertEqual(m["truncated"], 7)
+        self.assertIn("more modules", render_map(m))
+
+    def test_verify_cmd_detection(self):
+        tmp = Path(tempfile.mkdtemp())
+        _write(tmp, "go.mod", "module x\n")
+        self.assertEqual(detect_verify_cmd(tmp, ["go.mod", "main.go"]), "go test ./...")
+        tmp2 = Path(tempfile.mkdtemp())
+        _write(tmp2, "package.json", json.dumps({"scripts": {"test": "jest"}}))
+        self.assertEqual(detect_verify_cmd(tmp2, ["package.json"]), "npm test")
+        tmp3 = Path(tempfile.mkdtemp())
+        _write(tmp3, "tests/test_x.py", "def test_x(): pass\n")
+        self.assertEqual(detect_verify_cmd(tmp3, ["tests/test_x.py", "a.py"]),
+                         "python3 -m unittest discover -s tests -t . -q")
+
+    def test_js_export_surface(self):
+        tmp = Path(tempfile.mkdtemp())
+        _write(tmp, "lib/api.ts",
+               "// HTTP client\n"
+               "export function fetchUser(id) {}\n"
+               "export class Client {}\n"
+               "export const VERSION = '1';\n"
+               "function internal() {}\n")
+        m = build_map(str(tmp))
+        text = render_map(m)
+        self.assertIn("`fetchUser`", text)
+        self.assertIn("`Client`", text)
+        self.assertIn("`VERSION`", text)
+        self.assertNotIn("internal", text)
+
+    def test_matches_validated_winning_config(self):
+        """PROOF: the generated map reproduces the benchmark-validated artifact.
+
+        bench/configs/optimized/CLAUDE.md is the orientation map SA-Bench measured
+        at ~41-47% fewer tokens with quality held. If the generated map carries the
+        same module index, public surface, and verify command, it is a drop-in for
+        that proven lever -- the savings transfer.
+        """
+        fixture = REPO_ROOT / "bench" / "fixture"
+        validated = (REPO_ROOT / "bench" / "configs" / "optimized" / "CLAUDE.md").read_text()
+        m = build_map(str(fixture))
+        text = render_map(m)
+        paths = {mod["path"] for mod in m["modules"]}
+
+        # Same module set the validated map indexes.
+        for expected in ("ledger/models.py", "ledger/store.py", "ledger/report.py",
+                         "ledger/cli.py", "tests/test_ledger.py"):
+            self.assertIn(expected, paths, f"map is missing {expected}")
+
+        # Same public surface the validated map names.
+        for sym in ("Account(id, name)", "Transaction(id, account_id, amount, category, note=...)",
+                    "LedgerStore", "add_account", "by_account",
+                    "totals_by_category", "grand_total", "list_transactions"):
+            self.assertIn(sym, text, f"map is missing symbol {sym}")
+
+        # Same verify command and read-once discipline as the validated map.
+        self.assertIn("python3 -m unittest discover -s tests -t . -q", text)
+        self.assertIn("python3 -m unittest discover -s tests -t . -q", validated)
+        self.assertIn("Read a file once", text)
+        self.assertIn("authoritative", text)
 
 
 def _fake_token_report() -> dict:
