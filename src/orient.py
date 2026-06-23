@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import is_vendored_for_findings, looks_generated, looks_minified
-from .repo_scan import JUNK_EXT, JUNK_NAMES, _is_junk, _tracked_files
+from .repo_scan import _is_junk, _tracked_files
 
 # Extensions we can describe a public surface for, in display priority order.
 PY_EXT = {".py"}
@@ -60,8 +60,8 @@ def _fmt_args(node: ast.arguments) -> str:
             parts.append(a.arg)
     if node.vararg:
         parts.append("*" + node.vararg.arg)
-    for a in node.kwonlyargs:
-        parts.append(f"{a.arg}=...")
+    for a, d in zip(node.kwonlyargs, node.kw_defaults):
+        parts.append(f"{a.arg}=..." if d is not None else a.arg)
     if node.kwarg:
         parts.append("**" + node.kwarg.arg)
     return ", ".join(parts)
@@ -69,7 +69,10 @@ def _fmt_args(node: ast.arguments) -> str:
 
 def _is_dataclass(node: ast.ClassDef) -> bool:
     for dec in node.decorator_list:
-        name = dec.func.id if isinstance(dec, ast.Call) and isinstance(dec.func, ast.Name) else getattr(dec, "id", None)
+        if isinstance(dec, ast.Call):
+            dec = dec.func
+        # plain `@dataclass` (Name) or `@dataclasses.dataclass` (Attribute)
+        name = dec.attr if isinstance(dec, ast.Attribute) else getattr(dec, "id", None)
         if name == "dataclass":
             return True
     return False
@@ -82,6 +85,13 @@ def _class_fields(node: ast.ClassDef) -> list[str]:
         if isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name):
             fields.append(stmt.target.id + ("=..." if stmt.value is not None else ""))
     return fields
+
+
+def _fmt_fields(fields: list[str]) -> str:
+    """Comma-join class fields, capping pathological cases."""
+    if len(fields) > MAX_FIELDS_PER_CLASS:
+        fields = fields[:MAX_FIELDS_PER_CLASS] + ["..."]
+    return ", ".join(fields)
 
 
 def _class_methods(node: ast.ClassDef) -> list[str]:
@@ -106,17 +116,24 @@ def _py_surface(text: str) -> tuple[str, list[str]]:
         if isinstance(node, ast.ClassDef):
             if node.name.startswith("_"):
                 continue
-            if _is_dataclass(node) or _class_fields(node):
-                fields = _class_fields(node)
-                if len(fields) > MAX_FIELDS_PER_CLASS:
-                    fields = fields[:MAX_FIELDS_PER_CLASS] + ["..."]
-                symbols.append(f"`{node.name}({', '.join(fields)})`")
-            else:
-                methods = _class_methods(node)
+            methods = _class_methods(node)
+            fields = _class_fields(node)
+            is_dc = _is_dataclass(node)
+            # Render a class as a field-record (`Name(field, ...)`) only when it is
+            # a dataclass, or a pure data holder (annotated fields, no public
+            # methods). A plain class that happens to have a class-level constant
+            # is still defined by its METHODS -- show those, not the constant.
+            if is_dc:
+                head = f"`{node.name}({_fmt_fields(fields)})`"
                 if methods:
-                    symbols.append(f"`{node.name}`: " + ", ".join(f"`{m}`" for m in methods))
-                else:
-                    symbols.append(f"`{node.name}`")
+                    head += ": " + ", ".join(f"`{m}`" for m in methods)
+                symbols.append(head)
+            elif methods:
+                symbols.append(f"`{node.name}`: " + ", ".join(f"`{m}`" for m in methods))
+            elif fields:
+                symbols.append(f"`{node.name}({_fmt_fields(fields)})`")
+            else:
+                symbols.append(f"`{node.name}`")
         elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             if node.name.startswith("_"):
                 continue
@@ -148,7 +165,10 @@ def _regex_surface(text: str, ext: str) -> tuple[str, list[str]]:
             continue
         m = _LEADING_COMMENT.match(s)
         if m and m.group(1).strip():
-            summary = m.group(1).strip().rstrip("*/").rstrip(".").strip()
+            summary = m.group(1).strip()
+            if summary.endswith("*/"):       # block-comment terminator only
+                summary = summary[:-2].strip()
+            summary = summary.rstrip(".").strip()
         break
 
     names: list[str] = []
@@ -255,7 +275,7 @@ def build_map(repo_path: str, max_modules: int = DEFAULT_MAX_MODULES,
         # would leak its contents.
         if any(part.startswith(".") for part in rel.split("/")[:-1]):
             continue
-        if _is_junk(f.name, suffix) or f.name in JUNK_NAMES or suffix in JUNK_EXT:
+        if _is_junk(f.name, suffix):
             continue
         text = data.decode("utf-8", "replace")
         if looks_generated(text) or looks_minified(text) or is_vendored_for_findings(rel):

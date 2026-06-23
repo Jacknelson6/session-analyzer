@@ -273,6 +273,46 @@ class OrientationMap(unittest.TestCase):
         self.assertIn("`top(a, b=..., *args, **kw)`", text)
         self.assertNotIn("_hidden", text)
 
+    def test_plain_class_with_constant_keeps_methods(self):
+        # A non-dataclass with a class-level constant is defined by its methods,
+        # not the constant -- the methods must not be dropped.
+        tmp = Path(tempfile.mkdtemp())
+        _write(tmp, "svc.py",
+               '"""Svc."""\n'
+               "class Service:\n"
+               "    timeout: int = 30\n"
+               "    def run(self, x): ...\n"
+               "    def stop(self): ...\n")
+        text = render_map(build_map(str(tmp)))
+        self.assertIn("`run(x)`", text)
+        self.assertIn("`stop()`", text)
+
+    def test_dataclass_attribute_decorator_and_methods(self):
+        tmp = Path(tempfile.mkdtemp())
+        _write(tmp, "cfg.py",
+               '"""Cfg."""\n'
+               "import dataclasses\n\n"
+               "@dataclasses.dataclass\nclass Cfg:\n"
+               "    a: int\n    b: str = 'x'\n"
+               "    def validate(self): ...\n")
+        text = render_map(build_map(str(tmp)))
+        self.assertIn("`Cfg(a, b=...)`", text)   # recognized as a dataclass
+        self.assertIn("`validate()`", text)       # its methods still surface
+
+    def test_required_kwonly_not_marked_optional(self):
+        tmp = Path(tempfile.mkdtemp())
+        _write(tmp, "k.py",
+               '"""K."""\n'
+               "def h(a, *, k, opt=2): ...\n")
+        text = render_map(build_map(str(tmp)))
+        self.assertIn("`h(a, k, opt=...)`", text)  # k required, opt optional
+
+    def test_comment_summary_preserves_trailing_chars(self):
+        tmp = Path(tempfile.mkdtemp())
+        _write(tmp, "r.js", "// rate is req/s\nexport function f() {}\n")
+        text = render_map(build_map(str(tmp)))
+        self.assertIn("rate is req/s", text)       # slash not chewed off
+
     def test_excludes_dotdirs_and_generated(self):
         tmp = Path(tempfile.mkdtemp())
         _write(tmp, "src/real.py", '"""Real."""\ndef go(): ...\n')
