@@ -81,16 +81,15 @@ repo's layout every session, and it costs zero model tokens to build.
 This repo ships **two skills**. Say a skill's name in chat, or type its slash
 command — you do not manage paths or flags, that is the agent's job.
 
-```
-/session-analyzer                  analyze all my sessions for token waste + loop gaps
-/session-analyzer both             tokens AND repo structure, ranked together
-/session-analyzer repo             just scan this repo for structure problems
-/session-analyzer last 7 days      only sessions from the past week
-/session-analyzer map              generate the orientation map for this repo
-
-/loop-me                           interview me to find a low-cost, high-impact routine to delegate
-/loop-me triage new issues         grill me into a buildable, cheap-to-run loop spec for that workflow
-```
+| Invoke | What you get |
+| --- | --- |
+| `/session-analyzer` | Analyze all my sessions for token waste + loop gaps |
+| `/session-analyzer both` | Tokens AND repo structure, ranked together |
+| `/session-analyzer repo` | Just scan this repo for structure problems |
+| `/session-analyzer last 7 days` | Only sessions from the past week |
+| `/session-analyzer map` | Generate the orientation map for this repo |
+| `/loop-me` | Interview me to find a low-cost, high-impact routine to delegate |
+| `/loop-me triage new issues` | Grill me into a buildable, cheap-to-run loop spec for that workflow |
 
 `/session-analyzer` also fires on plain asks like *"why is Claude burning so many
 tokens?"* or *"make my repo cheaper for agents."* `/loop-me` is invoke-only — say
