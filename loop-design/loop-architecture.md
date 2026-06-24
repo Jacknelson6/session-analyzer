@@ -1,9 +1,9 @@
 # The optimal loop architecture (for Claude Code and similar agents)
 
-This is the architecture `loop-me` specs every loop against. It is not a
-preference; the trade-offs below were measured in this repo's benchmark
-(`bench/`, `docs/loop-cap.md`). Keep this file next to `SKILL.md` so the skill is
-self-contained when copied to `~/.claude/skills/loop-me/`.
+This is the architecture the session-analyzer skill's loop-design mode specs
+every loop against (see `loop-design/GUIDE.md`). It is not a preference; the
+trade-offs below were measured in this repo's benchmark (`bench/`,
+`docs/loop-cap.md`).
 
 ## The shape
 

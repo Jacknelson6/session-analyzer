@@ -146,6 +146,14 @@ wrong on a real run.
     %, costs ~15% tokens, churns at the hardest, and cannot reliably localize. Its
     value is confined to the narrow band of genuinely-missable implicit
     requirements. Loop is surgical, not blanket. Written up in docs/loop-cap.md.
+45. One skill, one way in. Collapsed the surface: folded the separate `loop-me`
+    skill into session-analyzer as a loop-design capability (its driver is now
+    `loop-design/GUIDE.md`, with the architecture/template/example alongside; no
+    second SKILL.md to install or invoke). Rewrote the README to present exactly
+    one entry point -- "just say 'session analyzer'" -- with the modes/map/loop
+    design as plain-language intents, and removed all CLI commands/flags from it
+    (those live in AGENTS.md). The goal: fewer things to invoke, nothing to
+    memorize.
 44. Simpler entry point + projected savings. Two usability wins. (a) `analyze` is
     now the default subcommand: bare `bin/analyze` (and `bin/analyze --since 7`)
     runs token coaching across all sessions, so the common path needs no

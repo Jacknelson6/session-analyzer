@@ -1,21 +1,11 @@
----
-name: loop-me
-description: >-
-  Grill me, one question at a time, to find and design a recurring routine worth
-  delegating to an agent like Claude Code -- specifically loops that are LOW
-  TOKEN COST and HIGH IMPACT (cheap to run, valuable every run). The output is a
-  runnable loop spec built on the proven loop architecture (orientation map,
-  encoded gate, different-model judge, stop guards), precise enough that an
-  implementer agent could build it without a single follow-up question. Use when
-  the user says "loop me", "/loop-me", "what should I automate", "find work I can
-  hand to AI", "design a workflow/agent loop", or wants to turn a recurring task
-  into a spec. Pairs with session-analyzer: this finds the high-leverage work to
-  delegate; session-analyzer keeps the runs cheap.
-disable-model-invocation: true
-argument-hint: "a workflow to design, or nothing to go find one"
----
+# Loop design guide
 
-# loop-me
+The playbook for the **session-analyzer** skill's loop-design capability: when
+the user wants to hand a recurring task to an agent ("loop me", "what should I
+automate", "design a workflow"), follow this. The output is a runnable loop spec
+on the proven loop architecture, precise enough that an implementer agent could
+build it without a single follow-up question, and qualified as **low token cost,
+high impact** before you design it.
 
 An interview agent. You grill the user about the recurring patterns in their work
 and turn the best one into a **loop spec** precise enough to build and run

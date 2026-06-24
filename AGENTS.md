@@ -94,9 +94,11 @@ Common flags: `--since DAYS` (recency), `--format terminal|markdown|json`,
 N`, `--scope-repo`, and the four `--price-*` overrides for exact cost. Full flags:
 `"$SA" <command> --help`. Finding fields: [docs/finding-schema.md](docs/finding-schema.md).
 
-## Sibling skill: loop-me
+## Loop design (same skill)
 
-`loop-me/` is a second, invoke-only skill (`/loop-me`). It interviews the user to
-design low-cost / high-impact recurring loops on the proven loop architecture
-(orientation map, encoded gate, different-model judge, stop guards). Its own
-`loop-me/SKILL.md` is the driver; it produces a workflow spec, not code.
+When the user wants to delegate a recurring task ("loop me", "what should I
+automate", "design a workflow"), switch into loop-design mode and follow
+`loop-design/GUIDE.md`. It interviews the user to design a low-cost / high-impact
+loop on the proven architecture (orientation map, encoded gate, different-model
+judge, stop guards) and produces a workflow spec, not code. Templates and a worked
+example live under `loop-design/`.
