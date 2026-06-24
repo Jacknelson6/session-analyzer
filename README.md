@@ -35,6 +35,7 @@ No dependencies, Python 3.9+. Clone this repo and drop the folder at
 `~/.claude/skills/session-analyzer/`. Then use it as above.
 
 ## How does it work?
+<img width="1672" height="941" alt="image" src="https://github.com/user-attachments/assets/095f3220-ffa0-473c-91f2-f61781d27434" />
 
 See **[docs/how-it-works.md](docs/how-it-works.md)** — the pipeline, a sample
 report, and the benchmark proof. Driving the underlying CLI directly:
