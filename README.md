@@ -7,8 +7,10 @@
 It reads your Claude Code history and tells you how to fix your sessions so they
 cost less and your loops run better.
 
-**~41-47% fewer tokens with no quality loss, plus an encoded verify-loop that
-catches the mistakes Claude would otherwise hand back.** Measured on Sonnet 4.6 and Opus 4.8.
+**~41-47% fewer tokens with no quality loss.** It generates the proven token
+lever — an orientation map of your repo — on demand with `bin/analyze map`, and
+flags the loop gaps that make Claude hand work back to you. Measured on Sonnet
+4.6 and Opus 4.8.
 
 Works with Claude Code, Codex, OpenCode, and any agent that reads [`AGENTS.md`](AGENTS.md).
 
@@ -58,6 +60,42 @@ bin/analyze map --repo "$PWD" --out CLAUDE.md
 It emits an authoritative file/symbol index plus a read-once rule and the right
 verify command for your stack (Python/JS/TS/Go/Rust). Zero model tokens to build.
 
+## Cheat sheet — what you can invoke
+
+This repo ships **two skills** plus the `analyze` CLI. Say a skill's name in
+chat, or type its slash command.
+
+### Skills
+
+```
+/session-analyzer                  analyze all my sessions for token waste + loop gaps
+/session-analyzer both             tokens AND repo structure, ranked together
+/session-analyzer repo             just scan this repo for structure problems
+/session-analyzer last 7 days      only sessions from the past week
+/session-analyzer map              generate the orientation map for this repo
+
+/loop-me                           interview me to find a low-cost, high-impact routine to delegate
+/loop-me triage new issues         grill me into a buildable, cheap-to-run loop spec for that workflow
+```
+
+`/session-analyzer` also fires on plain asks like *"why is Claude burning so many
+tokens?"* or *"make my repo cheaper for agents."* `/loop-me` is invoke-only (it
+won't trigger itself) — say it explicitly.
+
+### CLI (`bin/analyze`)
+
+```
+bin/analyze analyze --mode tokens          # token waste across all sessions
+bin/analyze analyze --mode repo --repo .   # repo hygiene scan
+bin/analyze analyze --mode both --repo .   # both, ranked together
+bin/analyze map --repo . --out CLAUDE.md   # generate the orientation map (proven token lever)
+bin/analyze doctor                         # what sessions/projects can it see?
+bin/analyze render .sa/run/bundle.json     # re-render a saved run
+```
+
+Add `--since 7` for recency, `--format markdown|json` for output, `--fail-under B`
+for a CI gate. Every flag: [docs/usage.md](docs/usage.md) or `bin/analyze <command> --help`.
+
 ## Proven on SA-Bench
 
 **SA-Bench** is the from-scratch A/B benchmark we built to measure whether a
@@ -103,8 +141,11 @@ cd session-analyzer
 ```
 
 Use it as a skill: drop the folder at `~/.claude/skills/session-analyzer/`, then
-just say **"session analyzer."** Full usage and flags: [docs/usage.md](docs/usage.md).
-Driving it from an agent: [AGENTS.md](AGENTS.md).
+just say **"session analyzer."** The repo also ships a second skill, **`loop-me`**
+(`loop-me/SKILL.md`) — copy `loop-me/` to `~/.claude/skills/loop-me/` and invoke
+it with **`/loop-me`** to get interviewed into a buildable workflow spec. Full
+usage and flags: [docs/usage.md](docs/usage.md). Driving it from an agent:
+[AGENTS.md](AGENTS.md).
 
 ## License
 
