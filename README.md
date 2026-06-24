@@ -60,17 +60,41 @@ bin/analyze map --repo "$PWD" --out CLAUDE.md
 It emits an authoritative file/symbol index plus a read-once rule and the right
 verify command for your stack (Python/JS/TS/Go/Rust). Zero model tokens to build.
 
-## Commands
+## Cheat sheet — what you can invoke
 
-| Command | What it does |
-| --- | --- |
-| `analyze --mode tokens\|repo\|both` | Find token waste, loop gaps, and repo structure problems |
-| `map --repo PATH --out CLAUDE.md` | Generate the orientation map (the proven token lever) |
-| `doctor` | Show which sessions and projects the tool can see |
-| `render BUNDLE.json` | Re-render a saved run (merges a sibling `synthesis.json`) |
+This repo ships **two skills** plus the `analyze` CLI. Say a skill's name in
+chat, or type its slash command.
 
-Every flag is in [docs/usage.md](docs/usage.md); `bin/analyze <command> --help`
-prints them too.
+### Skills
+
+```
+/session-analyzer                  analyze all my sessions for token waste + loop gaps
+/session-analyzer both             tokens AND repo structure, ranked together
+/session-analyzer repo             just scan this repo for structure problems
+/session-analyzer last 7 days      only sessions from the past week
+/session-analyzer map              generate the orientation map for this repo
+
+/loop-me                           interview me to find a recurring task worth delegating to AI
+/loop-me weekly investor update    grill me into a buildable spec for that specific workflow
+```
+
+`/session-analyzer` also fires on plain asks like *"why is Claude burning so many
+tokens?"* or *"make my repo cheaper for agents."* `/loop-me` is invoke-only (it
+won't trigger itself) — say it explicitly.
+
+### CLI (`bin/analyze`)
+
+```
+bin/analyze analyze --mode tokens          # token waste across all sessions
+bin/analyze analyze --mode repo --repo .   # repo hygiene scan
+bin/analyze analyze --mode both --repo .   # both, ranked together
+bin/analyze map --repo . --out CLAUDE.md   # generate the orientation map (proven token lever)
+bin/analyze doctor                         # what sessions/projects can it see?
+bin/analyze render .sa/run/bundle.json     # re-render a saved run
+```
+
+Add `--since 7` for recency, `--format markdown|json` for output, `--fail-under B`
+for a CI gate. Every flag: [docs/usage.md](docs/usage.md) or `bin/analyze <command> --help`.
 
 ## Proven on SA-Bench
 
@@ -117,8 +141,11 @@ cd session-analyzer
 ```
 
 Use it as a skill: drop the folder at `~/.claude/skills/session-analyzer/`, then
-just say **"session analyzer."** Full usage and flags: [docs/usage.md](docs/usage.md).
-Driving it from an agent: [AGENTS.md](AGENTS.md).
+just say **"session analyzer."** The repo also ships a second skill, **`loop-me`**
+(`loop-me/SKILL.md`) — copy `loop-me/` to `~/.claude/skills/loop-me/` and invoke
+it with **`/loop-me`** to get interviewed into a buildable workflow spec. Full
+usage and flags: [docs/usage.md](docs/usage.md). Driving it from an agent:
+[AGENTS.md](AGENTS.md).
 
 ## License
 
