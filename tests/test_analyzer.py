@@ -392,6 +392,65 @@ class OrientationMap(unittest.TestCase):
         self.assertIn("authoritative", text)
 
 
+class SavingsProjection(unittest.TestCase):
+    def _per(self, reread, ctx_in, cost):
+        return {"input_tokens": ctx_in, "cache_read_tokens": 0, "cache_creation_tokens": 0,
+                "est_cost_usd": cost, "reread_files": reread}
+
+    def test_map_scoped_to_reexploration_only(self):
+        from src.savings import project_savings
+        per = [
+            self._per({"a.py": 4}, 100_000, 1.00),   # eligible (re-read)
+            self._per({}, 100_000, 1.00),            # not eligible (no re-read)
+        ]
+        totals = {"input_tokens": 200_000, "cache_read_tokens": 0,
+                  "cache_creation_tokens": 0, "reclaimable_cache_usd": 0.0}
+        p = project_savings(per, totals)
+        self.assertEqual(p["map_eligible_sessions"], 1)
+        self.assertEqual(p["eligible_context_tokens"], 100_000)
+        # 41-47% of the ELIGIBLE 100k, not the full 200k
+        self.assertEqual(p["map_tokens_low"], 41_000)
+        self.assertEqual(p["map_tokens_high"], 47_000)
+        self.assertAlmostEqual(p["map_usd_low"], 0.41, places=2)
+        # percentage is of ALL tokens (200k), so ~20-23%
+        self.assertAlmostEqual(p["pct_low"], 0.205, places=3)
+
+    def test_no_reexploration_projects_zero_map(self):
+        from src.savings import project_savings, projection_lines
+        per = [self._per({}, 50_000, 0.5)]
+        totals = {"input_tokens": 50_000, "cache_read_tokens": 0,
+                  "cache_creation_tokens": 0, "reclaimable_cache_usd": 0.0}
+        p = project_savings(per, totals)
+        self.assertEqual(p["map_tokens_high"], 0)
+        # the honest "little to gain" message, not a fake number
+        self.assertIn("little to gain", " ".join(projection_lines(p)))
+
+    def test_projection_in_bundle(self):
+        from src.report import token_bundle
+        bundle = token_bundle(_fake_token_report())
+        self.assertIn("projection", bundle)
+
+
+class EntryPoint(unittest.TestCase):
+    def test_default_subcommand_is_analyze(self):
+        # `bin/analyze` with no subcommand should behave like `analyze`.
+        from src.cli import build_parser, main
+        import io
+        from contextlib import redirect_stdout
+        tmp = Path(tempfile.mkdtemp())
+        # empty projects root -> empty report, but must not error on missing subcommand
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            rc = main(["--projects-root", str(tmp), "--format", "json"])
+        self.assertEqual(rc, 0)
+        self.assertIn("verdict", buf.getvalue())
+
+    def test_explicit_subcommands_still_parse(self):
+        from src.cli import build_parser
+        args = build_parser().parse_args(["map", "--repo", "."])
+        self.assertEqual(args.cmd, "map")
+
+
 def _fake_token_report() -> dict:
     return {
         "sessions_analyzed": 2,

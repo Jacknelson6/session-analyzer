@@ -146,6 +146,18 @@ wrong on a real run.
     %, costs ~15% tokens, churns at the hardest, and cannot reliably localize. Its
     value is confined to the narrow band of genuinely-missable implicit
     requirements. Loop is surgical, not blanket. Written up in docs/loop-cap.md.
+44. Simpler entry point + projected savings. Two usability wins. (a) `analyze` is
+    now the default subcommand: bare `bin/analyze` (and `bin/analyze --since 7`)
+    runs token coaching across all sessions, so the common path needs no
+    memorized command. (b) Added `src/savings.py`: a projected-token-savings
+    estimate computed from the user's OWN measured usage times the benchmark rate
+    (41-47%), but scoped ONLY to sessions that actually re-explored the tree
+    (non-empty reread set) -- the regime round 37 proved the map wins in -- so it
+    never sprays the rate across cheap-navigation tokens. Rendered as a headline
+    block after the verdict (terminal, markdown, JSON) and led in the agent
+    digest, plus the already-measured cache-reclaimable figure. Honest by
+    construction: sessions with no re-exploration project "little to gain", not a
+    fake number. Suite 30 -> 35 tests.
 43. Operationalized the proven lever as a command (`map`). Rounds 36-42 proved the
     orientation map is the #1 token win (Pareto: ~41-47% fewer tokens, quality
     held), but the tool only *advised* writing one -- the agent hand-rolled it from

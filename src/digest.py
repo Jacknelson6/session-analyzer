@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from .budget import Budget
+from .savings import projection_lines
 
 
 def _trim(text: str, max_chars: int) -> str:
@@ -40,6 +41,12 @@ def write_digest(
     v = bundle.get("verdict", {})
     lines.append(f"**Verdict:** Grade {v.get('grade','?')}: {v.get('headline','')}")
     lines.append("")
+    plines = projection_lines(bundle.get("projection") or {})
+    if plines:
+        lines.append("## Projected savings (estimate, from usage x benchmark)")
+        for pl in plines:
+            lines.append(f"- {pl}")
+        lines.append("")
     lines.append("## Deterministic KPIs")
     for k in bundle.get("kpis", []):
         lines.append(f"- {k['label']}: {k['value']}")

@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from .savings import project_savings
+
 
 def _grade_from_score(score: float) -> str:
     if score >= 90:
@@ -99,6 +101,7 @@ def token_bundle(report: dict[str, Any]) -> dict[str, Any]:
             "subtitle": f"{totals['sessions']} sessions · {_human(totals['input_tokens']+totals['cache_read_tokens'])} tokens of context processed",
         },
         "verdict": {"grade": grade, "headline": headline},
+        "projection": project_savings(report.get("per_session", []), totals),
         "kpis": kpis,
         "trend": trend,
         "charts": [{"title": "Highest-waste sessions", "rows": chart_rows}] if chart_rows else [],
@@ -165,6 +168,7 @@ def combined_bundle(token_rep: dict[str, Any], repo_rep: dict[str, Any]) -> dict
             "grade": max(tb["verdict"]["grade"], rb["verdict"]["grade"]),
             "headline": tb["verdict"]["headline"] + "  " + rb["verdict"]["headline"],
         },
+        "projection": tb.get("projection"),
         "kpis": tb["kpis"][:3] + rb["kpis"][:3],
         "charts": tb["charts"] + rb["charts"],
         "findings": findings,

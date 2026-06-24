@@ -278,7 +278,17 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
+_SUBCOMMANDS = {"analyze", "extract", "render", "doctor", "map"}
+
+
 def main(argv=None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    # Simplest possible entry point: `analyze` (token coaching across all sessions)
+    # is the default. If the first token is not a known subcommand or a top-level
+    # flag, assume the user meant `analyze` and prepend it -- so plain `bin/analyze`
+    # and `bin/analyze --since 7` both Just Work.
+    if not argv or (argv[0] not in _SUBCOMMANDS and not argv[0] in ("-h", "--help", "--version")):
+        argv = ["analyze"] + argv
     args = build_parser().parse_args(argv)
     return args.func(args)
 

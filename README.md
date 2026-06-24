@@ -11,6 +11,10 @@ cost less and your loops run better.
 lever — an orientation map of your repo — on demand, and flags the loop gaps that
 make Claude hand work back to you. Measured on Sonnet 4.6 and Opus 4.8.
 
+It also projects, from your own measured usage, **how many tokens you'd save** by
+adopting the map — counted only on the sessions where Claude actually re-explored
+the tree, so the estimate is grounded, not hype.
+
 Works with Claude Code, Codex, OpenCode, and any agent that reads [`AGENTS.md`](AGENTS.md).
 
 </div>
