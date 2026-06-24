@@ -74,8 +74,8 @@ chat, or type its slash command.
 /session-analyzer last 7 days      only sessions from the past week
 /session-analyzer map              generate the orientation map for this repo
 
-/loop-me                           interview me to find a recurring task worth delegating to AI
-/loop-me weekly investor update    grill me into a buildable spec for that specific workflow
+/loop-me                           interview me to find a low-cost, high-impact routine to delegate
+/loop-me triage new issues         grill me into a buildable, cheap-to-run loop spec for that workflow
 ```
 
 `/session-analyzer` also fires on plain asks like *"why is Claude burning so many
