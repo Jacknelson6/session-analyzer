@@ -79,8 +79,20 @@ Do not read raw transcripts; the scripts digest them.
 | Workflow + tokens, all sessions | `"$SA" analyze --mode tokens --out "$OUT"` |
 | Scoped to one project | `"$SA" analyze --mode tokens --scope-repo --repo "/path" --out "$OUT"` |
 | Project structure too | `"$SA" analyze --mode both --repo "/path" --out "$OUT"` |
+| Repo hygiene only | `"$SA" analyze --mode repo --repo "/path" --out "$OUT"` |
 | Last 7 days | append `--since 7` |
 | Generate the orientation map (proven token lever) | `"$SA" map --repo "/path" --out "/path/CLAUDE.md"` |
+| Re-render a saved run (merges a sibling `synthesis.json`) | `"$SA" render "$OUT/bundle.json"` |
 | What can it see? | `"$SA" doctor` |
 
-Full flags: `"$SA" analyze --help`. Finding fields: [docs/finding-schema.md](docs/finding-schema.md).
+Common flags: `--since DAYS` (recency), `--format terminal|markdown|json`,
+`--fail-under A..F` (CI gate, non-zero exit if worse), `--top N`, `--max-sessions
+N`, `--scope-repo`, and the four `--price-*` overrides for exact cost. Full flags:
+`"$SA" <command> --help`. Finding fields: [docs/finding-schema.md](docs/finding-schema.md).
+
+## Sibling skill: loop-me
+
+`loop-me/` is a second, invoke-only skill (`/loop-me`). It interviews the user to
+design low-cost / high-impact recurring loops on the proven loop architecture
+(orientation map, encoded gate, different-model judge, stop guards). Its own
+`loop-me/SKILL.md` is the driver; it produces a workflow spec, not code.

@@ -8,9 +8,8 @@ It reads your Claude Code history and tells you how to fix your sessions so they
 cost less and your loops run better.
 
 **~41-47% fewer tokens with no quality loss.** It generates the proven token
-lever — an orientation map of your repo — on demand with `bin/analyze map`, and
-flags the loop gaps that make Claude hand work back to you. Measured on Sonnet
-4.6 and Opus 4.8.
+lever — an orientation map of your repo — on demand, and flags the loop gaps that
+make Claude hand work back to you. Measured on Sonnet 4.6 and Opus 4.8.
 
 Works with Claude Code, Codex, OpenCode, and any agent that reads [`AGENTS.md`](AGENTS.md).
 
@@ -35,37 +34,30 @@ your sessions  ->  deterministic crunch  ->  small digest  ->  agent advice
 The heavy lifting is deterministic, so it is cheap; the agent only writes the
 judgment calls.
 
-## Two modes
+## What it finds
 
-- **Sessions** (`--mode tokens`): where you waste tokens *and* where loops break
-  (no encoded check, retry loops, hand-backs to you), with the fixes. Cheaper
-  runs, better loops.
-- **Repo** (`--mode repo`): structure that taxes every agent, like junk,
-  duplicates, orphans, and god-files.
+- **Sessions:** where you waste tokens *and* where loops break down — no encoded
+  check, retry loops, work handed back to you — with the fixes. Cheaper runs,
+  better loops.
+- **Repo:** structure that taxes every agent working in it — junk, duplicates,
+  orphans, and god-files.
 
-`--mode both` runs them together. Details in [docs/usage.md](docs/usage.md).
+It can run either on its own or both together as one ranked list. Details in
+[docs/usage.md](docs/usage.md).
 
 ## The orientation map, on demand
 
 The benchmark below proves the orientation map is the single highest-leverage
-token lever (a Pareto win: fewer tokens *and* better output). `bin/analyze map`
-generates one for any repo deterministically, in the exact format SA-Bench
-validated, so you stop paying the agent to re-derive your repo's layout every
-session:
+token lever — a Pareto win: fewer tokens *and* better output. The tool generates
+one for any repo deterministically, in the exact format SA-Bench validated: an
+authoritative file/symbol index plus a read-once rule and the right verify command
+for your stack (Python/JS/TS/Go/Rust). You stop paying the agent to re-derive your
+repo's layout every session, and it costs zero model tokens to build.
 
-```bash
-bin/analyze map --repo "$PWD" --out CLAUDE.md
-```
+## What you can invoke
 
-It emits an authoritative file/symbol index plus a read-once rule and the right
-verify command for your stack (Python/JS/TS/Go/Rust). Zero model tokens to build.
-
-## Cheat sheet — what you can invoke
-
-This repo ships **two skills** plus the `analyze` CLI. Say a skill's name in
-chat, or type its slash command.
-
-### Skills
+This repo ships **two skills**. Say a skill's name in chat, or type its slash
+command — you do not manage paths or flags, that is the agent's job.
 
 ```
 /session-analyzer                  analyze all my sessions for token waste + loop gaps
@@ -79,22 +71,11 @@ chat, or type its slash command.
 ```
 
 `/session-analyzer` also fires on plain asks like *"why is Claude burning so many
-tokens?"* or *"make my repo cheaper for agents."* `/loop-me` is invoke-only (it
-won't trigger itself) — say it explicitly.
+tokens?"* or *"make my repo cheaper for agents."* `/loop-me` is invoke-only — say
+it explicitly.
 
-### CLI (`bin/analyze`)
-
-```
-bin/analyze analyze --mode tokens          # token waste across all sessions
-bin/analyze analyze --mode repo --repo .   # repo hygiene scan
-bin/analyze analyze --mode both --repo .   # both, ranked together
-bin/analyze map --repo . --out CLAUDE.md   # generate the orientation map (proven token lever)
-bin/analyze doctor                         # what sessions/projects can it see?
-bin/analyze render .sa/run/bundle.json     # re-render a saved run
-```
-
-Add `--since 7` for recency, `--format markdown|json` for output, `--fail-under B`
-for a CI gate. Every flag: [docs/usage.md](docs/usage.md) or `bin/analyze <command> --help`.
+Driving the `analyze` CLI directly — every command, flag, and the exact map
+invocation — is in [AGENTS.md](AGENTS.md).
 
 ## Proven on SA-Bench
 
@@ -132,19 +113,14 @@ Full method, the difficulty-ladder cap analysis, and the looper loop architectur
 
 ## Install
 
-No dependencies. Python 3.9+.
+No dependencies. Python 3.9+. Clone it, then drop the folder at
+`~/.claude/skills/session-analyzer/` and just say **"session analyzer."**
 
-```bash
-git clone https://github.com/Jacknelson6/session-analyzer.git
-cd session-analyzer
-./bin/analyze --help
-```
+The repo also ships a second skill, **`loop-me`** (`loop-me/SKILL.md`) — copy
+`loop-me/` to `~/.claude/skills/loop-me/` and invoke it with **`/loop-me`** to get
+interviewed into a buildable, cheap-to-run workflow spec.
 
-Use it as a skill: drop the folder at `~/.claude/skills/session-analyzer/`, then
-just say **"session analyzer."** The repo also ships a second skill, **`loop-me`**
-(`loop-me/SKILL.md`) — copy `loop-me/` to `~/.claude/skills/loop-me/` and invoke
-it with **`/loop-me`** to get interviewed into a buildable workflow spec. Full
-usage and flags: [docs/usage.md](docs/usage.md). Driving it from an agent:
+Full usage and flags: [docs/usage.md](docs/usage.md). Driving it from an agent:
 [AGENTS.md](AGENTS.md).
 
 ## License
