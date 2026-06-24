@@ -24,7 +24,11 @@ You do not manage paths or flags. That is the agent's job.
 ## By hand (CLI)
 
 ```bash
-# all sessions
+# simplest: bare `analyze` is the default subcommand (token coaching, all sessions)
+bin/analyze
+bin/analyze --since 7            # same, last 7 days
+
+# all sessions (explicit)
 bin/analyze analyze --mode tokens
 
 # scoped to the current repo

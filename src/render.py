@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from .savings import projection_lines
 from .theme import BOX, GLYPH, PALETTE, Style, hbar, make_style, pad, sparkline
 
 WIDTH = 76
@@ -122,6 +123,16 @@ def render_terminal(bundle: dict[str, Any], style: Style | None = None) -> str:
         out.append(verdict_line(st, v.get("grade", "C"), v.get("headline", "")))
         out.append("")
 
+    # Projected savings (the "what would I save?" headline)
+    plines = projection_lines(bundle.get("projection") or {})
+    if plines:
+        out.append("  " + st.role(GLYPH.get("arrow", "->") + " Projected savings", "good", bold=True))
+        out.append("     " + st.bold(plines[0]))
+        for extra in plines[1:]:
+            out.append("     " + st.dim(extra))
+        out.append("     " + st.dim("estimate, from your usage x our benchmark"))
+        out.append("")
+
     # KPI strip
     for kpi in bundle.get("kpis", []):
         out.append(kpi_row(st, kpi["label"], kpi["value"], kpi.get("role", "text")))
@@ -173,6 +184,13 @@ def render_markdown(bundle: dict[str, Any]) -> str:
     v = bundle.get("verdict", {})
     if v:
         out.append(f"**Grade {v.get('grade','C')}**: {v.get('headline','')}\n")
+    plines = projection_lines(bundle.get("projection") or {})
+    if plines:
+        out.append("## Projected savings")
+        out.append(f"**{plines[0]}**  ")
+        for extra in plines[1:]:
+            out.append(f"{extra}  ")
+        out.append("\n_Estimate, from your usage × our benchmark._\n")
     kpis = bundle.get("kpis", [])
     if kpis:
         out.append("| Metric | Value |")

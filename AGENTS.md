@@ -33,6 +33,10 @@ fixes directly.
   run `doctor` to list projects and ask which one. Write `--out` to a temp dir
   outside the skill.
 - Pure stdlib, Python 3.9+.
+- `analyze` is the default subcommand: bare `bin/analyze` (or `bin/analyze
+  --since 7`) runs token coaching across all sessions. The report leads with a
+  **projected token savings** estimate (the user's measured usage x the benchmark
+  rate, scoped to sessions that re-explored the tree).
 
 ## The loop
 
