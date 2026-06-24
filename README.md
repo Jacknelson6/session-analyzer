@@ -76,27 +76,19 @@ authoritative file/symbol index plus a read-once rule and the right verify comma
 for your stack (Python/JS/TS/Go/Rust). You stop paying the agent to re-derive your
 repo's layout every session, and it costs zero model tokens to build.
 
-## What you can invoke
+## How to use it
 
-This repo ships **two skills**. Say a skill's name in chat, or type its slash
-command — you do not manage paths or flags, that is the agent's job.
+Just say **"session analyzer."** One skill, one phrase — describe what you want
+in plain words and it does the rest. No flags, no modes, no second tool to learn.
 
-| Invoke | What you get |
-| --- | --- |
-| `/session-analyzer` | Analyze all my sessions for token waste + loop gaps |
-| `/session-analyzer both` | Tokens AND repo structure, ranked together |
-| `/session-analyzer repo` | Just scan this repo for structure problems |
-| `/session-analyzer last 7 days` | Only sessions from the past week |
-| `/session-analyzer map` | Generate the orientation map for this repo |
-| `/loop-me` | Interview me to find a low-cost, high-impact routine to delegate |
-| `/loop-me triage new issues` | Grill me into a buildable, cheap-to-run loop spec for that workflow |
+It understands what you mean:
 
-`/session-analyzer` also fires on plain asks like *"why is Claude burning so many
-tokens?"* or *"make my repo cheaper for agents."* `/loop-me` is invoke-only — say
-it explicitly.
-
-Driving the `analyze` CLI directly — every command, flag, and the exact map
-invocation — is in [AGENTS.md](AGENTS.md).
+- *"session analyzer"* / *"why is Claude burning so many tokens?"* — find token
+  waste and loop gaps across your sessions.
+- *"make my repo cheaper for agents"* — scan the repo's structure too.
+- *"map this repo"* — generate the orientation map (the proven token lever).
+- *"loop me"* / *"what should I automate?"* — it interviews you and designs a
+  low-cost, high-impact task to hand off to an agent.
 
 ## Proven on SA-Bench
 
@@ -134,15 +126,12 @@ Full method, the difficulty-ladder cap analysis, and the looper loop architectur
 
 ## Install
 
-No dependencies. Python 3.9+. Clone it, then drop the folder at
-`~/.claude/skills/session-analyzer/` and just say **"session analyzer."**
+No dependencies. Python 3.9+. Clone it, drop the folder at
+`~/.claude/skills/session-analyzer/`, and just say **"session analyzer."** That is
+the whole setup — one skill, one phrase.
 
-The repo also ships a second skill, **`loop-me`** (`loop-me/SKILL.md`) — copy
-`loop-me/` to `~/.claude/skills/loop-me/` and invoke it with **`/loop-me`** to get
-interviewed into a buildable, cheap-to-run workflow spec.
-
-Full usage and flags: [docs/usage.md](docs/usage.md). Driving it from an agent:
-[AGENTS.md](AGENTS.md).
+Power users and other agents driving the underlying CLI directly: see
+[AGENTS.md](AGENTS.md) and [docs/usage.md](docs/usage.md).
 
 ## License
 

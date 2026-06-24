@@ -1,5 +1,5 @@
 <!--
-loop-me spec skeleton. Copy to workflows/<slug>.md and fill every section, or
+Loop-design spec skeleton. Copy to workflows/<slug>.md and fill every section, or
 mark a section "none (deliberate)" with a one-line reason. A spec is done when an
 implementer agent could build AND run it with zero follow-up questions, and it
 clears the low-cost / high-impact bar.

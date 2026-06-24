@@ -1,5 +1,5 @@
 <!--
-Worked example produced by loop-me. Note how the spec is shaped to be cheap
+Worked example produced by loop-design mode. Note how the spec is shaped to be cheap
 (orientation map, diff-scoped reads, encoded gate, no blanket verify-loop, cheap
 worker model) and the cost/impact bar is stated explicitly.
 -->

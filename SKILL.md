@@ -7,9 +7,11 @@ description: >-
   agent run harder. Use when the user says "session analyzer", "analyze my
   sessions", "how do I use Claude Code better", "why is Claude burning tokens",
   "what am I doing wrong in my sessions", "make my repo cheaper for agents",
-  "give this repo an orientation map", or wants a recurring efficiency review. Can
-  generate an orientation CLAUDE.md (the benchmark-proven token lever) on demand
-  via `bin/analyze map`. The crunching is deterministic Python
+  "give this repo an orientation map", or wants a recurring efficiency review. It
+  can generate an orientation CLAUDE.md (the benchmark-proven token lever) on
+  demand, and it can design a recurring task into a low-cost, high-impact agent
+  loop when the user says "loop me", "what should I automate", "find work I can
+  hand to AI", or "design a workflow". The crunching is deterministic Python
   (zero model tokens); the agent reads a small digest and writes the advice.
   Hard token budget: 200K single, 400K both (real runs use far less). Benchmarked:
   ~41-47% fewer tokens with no loss in output quality (Sonnet 4.6 and Opus 4.8).
@@ -115,6 +117,27 @@ Then deliver:
 3. If their sessions are already clean, say so plainly. Do not pad.
 
 Do NOT surface secrets or credentials as a finding. That is not this tool's job.
+
+## Design a loop to delegate
+
+When the user wants to hand a recurring task to an agent ("loop me", "what should
+I automate", "find work I can hand to AI", "design a workflow"), switch into
+loop-design mode and follow [`loop-design/GUIDE.md`](loop-design/GUIDE.md). In
+short:
+
+- Find and qualify a loop that is **low token cost, high impact** (rank candidates
+  by frequency x toil saved / tokens per run; steer away from rare or
+  expensive-per-run ones). Your own session analysis is the best source for which
+  recurring work already burns the most tokens.
+- Interview the user **one question at a time, each with a recommended default**,
+  until the loop is buildable.
+- Produce a loop spec on the proven architecture (orientation map for cheap
+  context, an encoded programmatic gate, a different-model judge, push-right
+  checkpoints, and all five stop guards). Use
+  [`loop-design/templates/workflow-spec.md`](loop-design/templates/workflow-spec.md);
+  a worked example is in `loop-design/examples/`. The architecture and its
+  measured trade-offs are in
+  [`loop-design/loop-architecture.md`](loop-design/loop-architecture.md).
 
 ## Rules
 
