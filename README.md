@@ -38,6 +38,24 @@ your sessions  ->  deterministic crunch  ->  small digest  ->  agent advice
 The heavy lifting is deterministic, so it is cheap; the agent only writes the
 judgment calls.
 
+## What you get
+
+It leads with a grounded estimate of what you'd save, then the ranked fixes:
+
+```
+ C   69% cache hit-rate across 8 sessions, ~$1.21 reclaimable.
+
+ → Projected savings
+    Adopt the orientation map: ~139K-160K tokens (~8-9% of all tokens).
+    basis: 1 of 8 sessions re-explored the tree; benchmark rate 41-47%
+    applied only to those.
+    Fix cache misses: ~$1.21 more recoverable (see findings).
+```
+
+The savings number is your own measured usage times the benchmark rate, counted
+only on sessions that actually re-explored the tree — so it is an estimate you
+can trust, not a headline figure.
+
 ## What it finds
 
 - **Sessions:** where you waste tokens *and* where loops break down — no encoded
