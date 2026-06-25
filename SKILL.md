@@ -27,6 +27,32 @@ the worst patterns and turn it into specific, grounded advice.
 Benchmarked impact: ~41% fewer tokens with task success unchanged (see the repo's
 Proven savings section and `bench/`).
 
+## Decide what to run (routing)
+
+One entry point; you pick the path from what the user said. Read the request, then:
+
+- **Default — token + loop coaching.** Any general ask ("session analyzer", "why
+  is Claude burning tokens", "what am I doing wrong") → analyze ALL sessions for
+  token waste and loop gaps. This always runs unless the user clearly wants only
+  one of the below.
+- **Add a repo scan** when the user names or points at a project, or asks about
+  repo structure / cleanliness / "make my repo cheaper for agents" → run the repo
+  scan too (token + repo, ranked together). If which project is ambiguous, run
+  `doctor` and ask.
+- **Generate the orientation map** when the user asks to "map this repo", OR when
+  the session analysis shows repeated tree re-exploration (re-reads, broad
+  searches before editing) in a known project → generate it and offer it. The map
+  is the highest-leverage token lever, so reach for it whenever re-exploration is
+  the pattern.
+- **Switch to loop design** when the user wants to delegate a recurring task
+  ("loop me", "what should I automate", "find work I can hand to AI", "design a
+  workflow") → follow the loop-design section below. This is the one path that
+  needs an explicit intent; do not start an interview unprompted.
+
+These are not exclusive: a single request can run the session analysis, surface
+the map as the top fix, and end by offering to design a loop. Default to doing the
+analysis first — it is the evidence the other paths build on.
+
 ## How to talk to the user (read this first)
 
 This is a coaching conversation about the user's Claude Code usage. Do not break
