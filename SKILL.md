@@ -9,9 +9,9 @@ description: >-
   "what am I doing wrong in my sessions", "make my repo cheaper for agents",
   "give this repo an orientation map", or wants a recurring efficiency review. It
   can generate an orientation CLAUDE.md (the benchmark-proven token lever) on
-  demand, and it can design a recurring task into a low-cost, high-impact agent
-  loop when the user says "loop me", "what should I automate", "find work I can
-  hand to AI", or "design a workflow". The crunching is deterministic Python
+  demand, and on "/session-analyzer loop" / "loop me" / "what should I automate"
+  it reads the session history and suggests token-efficient loops the user's agent
+  can run to automate the repetitive work it finds. The crunching is deterministic Python
   (zero model tokens); the agent reads a small digest and writes the advice.
   Hard token budget: 200K single, 400K both (real runs use far less). Benchmarked:
   ~41-47% fewer tokens with no loss in output quality (Sonnet 4.6 and Opus 4.8).
@@ -44,10 +44,11 @@ One entry point; you pick the path from what the user said. Read the request, th
   searches before editing) in a known project → generate it and offer it. The map
   is the highest-leverage token lever, so reach for it whenever re-exploration is
   the pattern.
-- **Switch to loop design** when the user wants to delegate a recurring task
-  ("loop me", "what should I automate", "find work I can hand to AI", "design a
-  workflow") → follow the loop-design section below. This is the one path that
-  needs an explicit intent; do not start an interview unprompted.
+- **Suggest loops** when the user runs `/session-analyzer loop` or says "loop me"
+  / "what should I automate" → analyze the session history and propose
+  token-efficient loops that automate the repetitive work it shows (see the loop
+  section below). Lead with the evidence; do NOT schedule a recurring run of this
+  tool, and do NOT open a blank-page interview.
 
 These are not exclusive: a single request can run the session analysis, surface
 the map as the top fix, and end by offering to design a loop. Default to doing the
@@ -144,26 +145,31 @@ Then deliver:
 
 Do NOT surface secrets or credentials as a finding. That is not this tool's job.
 
-## Design a loop to delegate
+## Suggest loops to automate the user's work (`/session-analyzer loop`)
 
-When the user wants to hand a recurring task to an agent ("loop me", "what should
-I automate", "find work I can hand to AI", "design a workflow"), switch into
-loop-design mode and follow [`loop-design/GUIDE.md`](loop-design/GUIDE.md). In
-short:
+When the user runs `/session-analyzer loop` (or says "loop me" / "what should I
+automate"), the job is to **read their session history and propose token-efficient
+loops their agent can run to automate the repetitive work it shows.** It is
+data-driven, not a blank-page interview. Follow
+[`loop-design/GUIDE.md`](loop-design/GUIDE.md). In short:
 
-- Find and qualify a loop that is **low token cost, high impact** (rank candidates
-  by frequency x toil saved / tokens per run; steer away from rare or
-  expensive-per-run ones). Your own session analysis is the best source for which
-  recurring work already burns the most tokens.
-- Interview the user **one question at a time, each with a recommended default**,
-  until the loop is buildable.
-- Produce a loop spec on the proven architecture (orientation map for cheap
-  context, an encoded programmatic gate, a different-model judge, push-right
-  checkpoints, and all five stop guards). Use
+- **Mine the history first.** Analyze the sessions and find recurring, delegatable
+  work: the same command sequence run again and again, a task shape redone every
+  time (regen types after a schema change, test → fix-lint → rebuild), retry loops
+  and hand-backs, high-frequency chores.
+- **Propose the top 2-3 loops**, ranked by impact per token, each grounded in the
+  evidence: "you ran X N times across M sessions; a loop does it for ~Yk
+  tokens/run and saves ~Z." Design each one **low token cost, high impact**
+  (orientation map for cheap context, an encoded programmatic gate, the cheapest
+  model that clears the bar, scoped inputs).
+- **Only after the user picks one**, interview to fill the gaps and produce a
+  buildable spec on the proven architecture (encoded gate, different-model judge,
+  push-right checkpoints, all five stop guards). Use
   [`loop-design/templates/workflow-spec.md`](loop-design/templates/workflow-spec.md);
-  a worked example is in `loop-design/examples/`. The architecture and its
-  measured trade-offs are in
+  example in `loop-design/examples/`; architecture and trade-offs in
   [`loop-design/loop-architecture.md`](loop-design/loop-architecture.md).
+- **Do NOT** propose scheduling a recurring run of session-analyzer itself — that
+  is not a loop suggestion. The loops automate the user's work, not the analysis.
 
 ## Rules
 
