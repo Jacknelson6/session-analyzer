@@ -1,34 +1,52 @@
 # Loop design guide
 
-The playbook for the **session-analyzer** skill's loop-design capability: when
-the user wants to hand a recurring task to an agent ("loop me", "what should I
-automate", "design a workflow"), follow this. The output is a runnable loop spec
-on the proven loop architecture, precise enough that an implementer agent could
-build it without a single follow-up question, and qualified as **low token cost,
-high impact** before you design it.
+# Loop design guide
 
-An interview agent. You grill the user about the recurring patterns in their work
-and turn the best one into a **loop spec** precise enough to build and run
-autonomously. You do not write implementation code here; you produce the
-specification an implementer agent (or the `looper` skill) executes later.
+What **`/session-analyzer loop`** does: read the user's session history and
+propose **token-efficient loops their agent can run to automate the repetitive
+work it finds**. It is data-driven — the suggestions come from what the sessions
+actually show the user doing over and over, not from a blank-page interview. When
+the user picks one, you turn it into a runnable spec on the proven loop
+architecture (`loop-architecture.md` here; trade-offs in `docs/loop-cap.md`).
+Inspired by Matt Pocock's `loop-me`, but grounded in the user's own history.
 
-You are not here to design *any* loop. You are here to find and design loops that
-are **low token cost and high impact** -- routines cheap enough to run constantly
-and valuable enough to be worth running. A good loop spec does three things: it
-captures the user's real work faithfully, it clears the cost/impact bar below, and
-it is structured as an **optimal agent loop** so it runs reliably and cheaply
-without babysitting. The interview gets you the first; the triage gets you the
-second; this skill's architecture gets you the third. Inspired by Matt Pocock's
-`loop-me`; the loop architecture and its measured trade-offs come from this repo
-(`loop-architecture.md` in this folder, and `docs/loop-cap.md`).
+## What this is NOT
 
-## The loop lens
+- **NOT "schedule a recurring session-analyzer review."** A periodic re-run of
+  this tool is not a loop suggestion. The loops automate the USER's recurring
+  work, not the analysis itself. Do not propose cron-ing the analyzer.
+- **NOT a blank-page workflow interview.** Lead with the session evidence and
+  propose concrete loops; only interview to refine a loop the user picked.
 
-A **loop** is a recurring pattern in the user's life: their career, their week,
-their morning, a single repeated activity. Loops are worth delegating precisely
-because they repeat -- the cost of specifying one once is paid back every run.
-Your job is to spot a loop the user has stopped noticing because it is routine,
-then make it runnable.
+## The flow
+
+1. **Mine the history.** Run the session analysis and look for recurring,
+   delegatable work the user does by hand again and again (see "Signals" below).
+2. **Turn each pattern into a candidate loop:** its trigger, its steps, and what
+   it would save (time + tokens).
+3. **Make each token-efficient** — design it down with the low-cost / high-impact
+   levers and the architecture below before you pitch it.
+4. **Rank by impact per token and present the top 2-3** as concrete, evidence-
+   grounded suggestions: "you ran `<X>` N times across M sessions; a loop does it
+   for ~Yk tokens/run and saves ~Z." Let the user pick.
+5. **Only then interview** — to fill the gaps for the chosen loop until its spec
+   is buildable.
+
+## Signals in the history that a loop is hiding
+
+- **A repeated command or sequence** run many times across sessions (the
+  test → fix-lint → rebuild dance, regenerating types after a schema change, a
+  deploy check). The deterministic pass already surfaces these as repeated
+  commands.
+- **A task shape the user redoes every time** — "after I touch the schema I always
+  regen types and run the suite", "every PR I write release notes".
+- **Retry loops and hand-backs** — work that bounced back to the user because
+  there was no encoded check. A loop with that check encoded pays twice: it saves
+  the toil and closes itself.
+- **High-frequency chores** — changelog, release notes, dependency bumps, issue
+  triage, status digests.
+
+The best candidates are high-frequency, cheap-per-run, and currently manual.
 
 ## Vocabulary (reach for it only when it helps)
 
@@ -147,9 +165,10 @@ explain them in the user's terms when they come up:
 - A **no-progress / stall** signal (stop after the same state twice).
 - A **budget cap** (tokens or cost per run).
 
-## How to run the interview
+## Refining a chosen loop (the interview)
 
-This is a stateful grilling session. The rules:
+Once the user picks one of your suggestions, fill the gaps until its spec is
+buildable. This is a stateful grilling session. The rules:
 
 1. **One question at a time.** Never batch. Each question builds on the last
    answer. A wall of questions makes the user pattern-match instead of think.
@@ -158,12 +177,10 @@ This is a stateful grilling session. The rules:
    Reacting is faster and more accurate than generating from a blank page.
 3. **Grill until it is buildable, not until it is polite to stop.** Nothing is
    done while a question remains.
-4. **Find the loop first if the user did not name one.** With no argument, open by
-   mapping their week/day/role and proposing 2-3 candidate loops **ranked by impact
-   per token** -- frequency x toil saved, divided by the estimated token cost to
-   run. Favor the cheap-and-frequent. Let the user pick. (If their session history
-   is available, run session-analyzer first to ground the ranking in what actually
-   burns tokens today.)
+4. **Start from the evidence, not a blank page.** You already mined the history
+   and proposed this loop -- carry that context in. Confirm the trigger, steps,
+   and frequency you inferred from the sessions instead of asking cold, and only
+   dig where the history left a gap.
 
 Question order -- adapt, but cover every architectural element so the spec has no
 holes:

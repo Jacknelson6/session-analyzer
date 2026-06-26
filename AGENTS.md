@@ -94,11 +94,14 @@ Common flags: `--since DAYS` (recency), `--format terminal|markdown|json`,
 N`, `--scope-repo`, and the four `--price-*` overrides for exact cost. Full flags:
 `"$SA" <command> --help`. Finding fields: [docs/finding-schema.md](docs/finding-schema.md).
 
-## Loop design (same skill)
+## Loop suggestions (same skill)
 
-When the user wants to delegate a recurring task ("loop me", "what should I
-automate", "design a workflow"), switch into loop-design mode and follow
-`loop-design/GUIDE.md`. It interviews the user to design a low-cost / high-impact
-loop on the proven architecture (orientation map, encoded gate, different-model
-judge, stop guards) and produces a workflow spec, not code. Templates and a worked
-example live under `loop-design/`.
+On `/session-analyzer loop` (or "loop me" / "what should I automate"), read the
+user's session history and propose token-efficient loops their agent can run to
+automate the repetitive work it shows — data-driven, not a blank-page interview,
+and never "schedule a recurring run of the analyzer." Mine the sessions for
+repeated command sequences, redone task shapes, retry loops, and high-frequency
+chores; pitch the top 2-3 ranked by impact per token, grounded in the evidence;
+then, once the user picks one, refine it into a buildable spec on the proven
+architecture. Full playbook in `loop-design/GUIDE.md`; template and example under
+`loop-design/`.

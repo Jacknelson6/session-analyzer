@@ -24,7 +24,7 @@ token waste and tighten the loops where Claude hands work back to you.
 | `/session-analyzer` | Finds token waste and loop gaps across your sessions, with the fixes |
 | `/session-analyzer <project>` | Also scans that repo's structure: junk, duplicates, orphans, god-files |
 | `/session-analyzer map` | Generates an orientation map for a repo — the single biggest token saver |
-| `/session-analyzer loop me` | Turns a recurring task into a cheap, runnable agent loop |
+| `/session-analyzer loop` | Mines your session history and suggests token-efficient loops your agent can run to automate the repetitive work it finds |
 
 It reports how many tokens you would save, then the ranked fixes. You approve the
 changes.
